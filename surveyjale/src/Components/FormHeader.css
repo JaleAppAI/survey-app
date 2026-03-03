@@ -1,0 +1,40 @@
+.form-header {
+    background-color: white;
+    padding: 28px 52px;
+    border-radius: 10px;
+    margin: 40px auto;
+    max-width: 620px;
+    pointer-events: none;
+}
+
+.form-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.form-header p {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.text-required-warning {
+    display: flex;
+    font-size: 2rem;
+    align-items: center;
+    gap: 4px;
+}
+
+.text-required {
+    font-family: 'Syne', sans-serif;
+    color: red;
+    padding-left: .2rem;
+}

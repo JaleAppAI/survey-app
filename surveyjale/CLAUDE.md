@@ -6,7 +6,7 @@ Project context and architectural guidelines for Claude Code sessions.
 
 ## Project Overview
 
-A React-based survey application that supports both typed and voice responses. Voice input is transcribed via AssemblyAI. The app is designed to be reusable across different survey campaigns — questions and conditional logic live in the database, not in the code. Admins can update question sets without touching the codebase.
+A React-based survey application that supports both typed and voice responses. Voice input is transcribed via Amazon Transcribe. The app is designed to be reusable across different survey campaigns — questions and conditional logic live in the database, not in the code. Admins can update question sets without touching the codebase.
 
 ---
 
@@ -14,38 +14,43 @@ A React-based survey application that supports both typed and voice responses. V
 
 | Layer | Technology | Notes |
 |---|---|---|
-| Frontend | React 19 (Create React App) | Hosted on Vercel |
-| Serverless API | Vercel Serverless Functions | Proxy layer — all external API calls go through here |
-| Transcription | AssemblyAI | Free tier: 180 hrs audio. Used for cross-device speech-to-text, including iPhone |
-| Database | Supabase (Postgres) | Stores responses, questions, and conditional logic |
-| Auth | Supabase Auth | Protects admin view — only authorised users can read results |
-| Deployment | Vercel | Hosts both the React frontend and serverless functions |
+| Frontend | React 19 (Vite) | Hosted on AWS Amplify Hosting |
+| Backend Framework | AWS Amplify Gen 2 | Code-first TypeScript backend using CDK |
+| API | AWS AppSync (GraphQL) | Auto-generated from Amplify Data schema |
+| Database | Amazon DynamoDB | Provisioned via Amplify Data models |
+| Serverless Functions | AWS Lambda | Defined with `defineFunction`, used for transcription |
+| Transcription | Amazon Transcribe | Replaces AssemblyAI. Audio uploaded to S3, transcribed by AWS |
+| Storage | Amazon S3 | Temporary audio file storage for transcription pipeline |
+| Auth | Amazon Cognito | Guest access enabled for anonymous survey submissions |
+| Deployment | AWS Amplify Hosting | Git-based CI/CD, auto-deploys frontend + backend on push |
 
 ---
 
 ## Architecture
 
 ### Security Model
-- **API keys never reach the browser.** AssemblyAI and Supabase service-role keys are stored as Vercel environment variables and accessed only within serverless functions.
-- All sensitive operations (submitting a response, fetching questions, uploading audio) are routed through `/api/*` serverless functions.
-- Serverless functions handle: input validation, response size limits, and basic rate limiting to prevent spam submissions.
-- Supabase Row Level Security (RLS) is enabled — responses can only be written or read via the server functions, never directly from the browser.
+- **No API keys in the codebase.** All AWS service access is handled through IAM roles automatically provisioned by Amplify.
+- The frontend communicates with the backend exclusively through the AppSync GraphQL API (for data operations) and custom mutations (for transcription).
+- Lambda functions receive only the IAM permissions explicitly granted in `backend.ts` — least-privilege by default.
+- DynamoDB authorization rules are defined per-model in the Amplify Data schema. Guest users can read questions and create responses. Admin access requires authentication.
+- S3 bucket access is scoped to specific prefixes (`temp-audio/*`, `transcripts/*`) via Amplify Storage access rules.
 
 ### Speech Transcription Flow
 1. User records audio in the browser (MediaRecorder API).
-2. Audio blob is sent to a Vercel serverless function (`/api/transcribe`).
-3. The function uploads the audio to AssemblyAI and polls for the transcript.
-4. Transcript text is returned to the frontend and populated into the response field.
-- AssemblyAI is used instead of the Web Speech API because browser speech recognition is not supported on iPhone (iOS Safari).
+2. Audio blob is base64-encoded and sent as a custom GraphQL mutation (`transcribeAudio`).
+3. The mutation triggers a Lambda function that uploads the audio to S3, starts an Amazon Transcribe job, polls for completion, and returns the transcript.
+4. Temporary S3 objects (audio + transcript JSON) are cleaned up after processing.
+5. Transcript text is returned to the frontend and populated into the response field.
+- Amazon Transcribe is used instead of the Web Speech API because browser speech recognition is not supported on iPhone (iOS Safari).
 
 ### Data Flow
-1. Questions and conditional logic are fetched from Supabase on load (via a serverless function).
+1. Questions and conditional logic are fetched from DynamoDB on load via the AppSync GraphQL API (`client.models.Question.list()`).
 2. User fills in responses (typed or transcribed).
-3. On submission, responses are posted to Supabase via a serverless function.
-4. Admin view fetches all responses, protected behind Supabase Auth.
+3. On submission, each response is created in DynamoDB via the AppSync API (`client.models.Response.create()`).
+4. Admin view fetches all responses, protected behind Cognito authentication.
 
 ### Question & Conditional Logic Schema
-Questions are stored in the database with fields that control branching behaviour — e.g. a response to Q1 may skip or show Q3. This keeps the frontend logic generic and data-driven. Never hardcode question text or flow in the React components.
+Questions are stored in DynamoDB with fields that control branching behaviour — e.g. a response to Q1 may skip or show Q3. This keeps the frontend logic generic and data-driven. Never hardcode question text or flow in the React components.
 
 ---
 
@@ -53,22 +58,71 @@ Questions are stored in the database with fields that control branching behaviou
 
 ```
 surveyjale/
+├── amplify/
+│   ├── auth/
+│   │   └── resource.ts              # Cognito auth config (guest access enabled)
+│   ├── data/
+│   │   └── resource.ts              # Data models (Question, Response) + transcribeAudio mutation
+│   ├── functions/
+│   │   └── transcribe/
+│   │       ├── resource.ts           # Lambda function definition
+│   │       └── handler.ts            # Transcription handler (S3 + Amazon Transcribe)
+│   ├── storage/
+│   │   └── resource.ts              # S3 bucket for temporary audio files
+│   ├── backend.ts                    # Wires all resources, grants IAM permissions
+│   ├── package.json
+│   └── tsconfig.json
 ├── public/
 ├── src/
-│   ├── App.js              # Root component, renders active question set
-│   ├── App.css             # Global app styles (background, layout)
-│   ├── index.js            # React entry point
-│   ├── index.css           # Base body/font styles
+│   ├── main.jsx             # React entry point, calls Amplify.configure()
+│   ├── App.jsx              # Root component, fetches questions, handles submission
+│   ├── App.css              # Global app styles (background, layout)
 │   └── Components/
-│       ├── Question.js     # Renders a single survey question (text + voice)
-│       └── Question.css    # Question component styles
-├── api/                    # Vercel serverless functions (to be created)
-│   ├── transcribe.js       # Proxies audio upload to AssemblyAI
-│   ├── submit.js           # Writes responses to Supabase
-│   └── questions.js        # Fetches question set from Supabase
+│       ├── FormHeader.jsx    # Survey header with instructions
+│       ├── FormHeader.css
+│       ├── Question.jsx      # Renders a single survey question (text + voice)
+│       └── Question.css
+├── scripts/
+│   └── seed-questions.js     # Seeds question data into DynamoDB
+├── amplify_outputs.json      # Auto-generated by sandbox/deploy — connects frontend to backend
 ├── CLAUDE.md
+├── vite.config.js
 └── package.json
 ```
+
+---
+
+## Amplify Backend Resources
+
+### Data Models (`amplify/data/resource.ts`)
+
+**Question**
+- `id` (auto-generated string)
+- `text` (string, required) — the question displayed to the user
+- `order` (integer, required) — display order
+- `conditions` (JSON, optional) — branching logic
+
+**Response**
+- `id` (auto-generated string)
+- `questionId` (string, required) — references a Question
+- `responseText` (string, required) — the user's answer
+
+**Custom Mutations**
+- `transcribeAudio(audio: String!): String` — accepts base64 audio, returns transcript text. Backed by the transcribe Lambda function.
+
+### Authorization Rules
+- **Question**: guests and authenticated users can read
+- **Response**: guests and authenticated users can create and read
+- **transcribeAudio**: guests can invoke
+- Default authorization mode: IAM (supports unauthenticated/guest access)
+
+### Lambda Functions (`amplify/functions/`)
+- **transcribe** — receives base64 audio, uploads to S3, runs Amazon Transcribe, returns transcript. Has IAM permissions for `transcribe:StartTranscriptionJob`, `transcribe:GetTranscriptionJob`, and read/write access to the S3 bucket. Timeout: 120s, Memory: 512MB.
+
+### Storage (`amplify/storage/resource.ts`)
+- S3 bucket `surveyAudioBucket` with scoped access:
+  - `temp-audio/*` — write access for audio uploads
+  - `transcripts/*` — read access for transcript results
 
 ---
 
@@ -84,23 +138,28 @@ surveyjale/
 
 ## Key Constraints & Decisions
 
-- **Do not use the Web Speech API** — it fails silently on iOS. All transcription goes through AssemblyAI via a server function.
-- **Do not call AssemblyAI or Supabase directly from the frontend.** Always route through `/api/*` functions.
-- **Do not hardcode questions** in React components. Questions are fetched from the database.
-- Keep serverless functions thin — validate input, call the external service, return the result. No business logic in the database layer.
+- **Do not use the Web Speech API** — it fails silently on iOS. All transcription goes through Amazon Transcribe via a Lambda function.
+- **Do not call AWS services directly from the frontend.** All data access goes through the Amplify Data client (`generateClient()`). Transcription goes through a custom GraphQL mutation.
+- **Do not hardcode questions** in React components. Questions are fetched from DynamoDB.
+- **Do not store API keys or secrets in code.** AWS access is managed entirely through IAM roles provisioned by Amplify. No environment variables needed for AWS service access.
+- Keep Lambda functions focused — validate input, call the AWS service, return the result. No business logic in the database layer.
 - The app must work on mobile, including iPhone Safari.
+- **Amplify Gen 2 only** — do not use Gen 1 CLI commands (`amplify add`, `amplify push`). All backend resources are defined as TypeScript in the `amplify/` directory.
+- The `amplify_outputs.json` file is auto-generated. Do not edit it manually. It is regenerated each time `npx ampx sandbox` runs or a deployment completes.
 
 ---
 
-## Environment Variables
+## Environment Variables & Secrets
 
-Stored in Vercel (never committed to the repo). Local development uses a `.env.local` file (gitignored).
+No API keys are needed in the codebase or environment. AWS credentials are handled through IAM roles:
 
-```
-ASSEMBLYAI_API_KEY=
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=   # Server-side only, never exposed to browser
-SUPABASE_ANON_KEY=           # Safe for use in serverless functions for auth checks
+- **Lambda functions** receive permissions via IAM policies defined in `backend.ts`
+- **Frontend** connects to backend services via `amplify_outputs.json` (auto-generated)
+- **Local development** requires AWS credentials configured via `aws configure` (profile with PowerUserAccess or AdministratorAccess-Amplify)
+
+If any third-party secrets are needed in the future, use Amplify's `secret()` function in resource definitions, and set values via:
+```bash
+npx ampx sandbox secret set SECRET_NAME
 ```
 
 ---
@@ -108,12 +167,31 @@ SUPABASE_ANON_KEY=           # Safe for use in serverless functions for auth che
 ## Development
 
 ```bash
-npm start       # Run locally on http://localhost:3000
-npm test        # Run test suite
-npm run build   # Production build
+# Start the cloud sandbox (deploys real AWS resources for dev)
+# Run this in a separate terminal — it watches for backend changes
+npx ampx sandbox
+
+# Run the frontend locally
+npm run dev
+
+# Seed questions into DynamoDB
+node scripts/seed-questions.js
+
+# Delete sandbox resources when done
+npx ampx sandbox delete
+
+# Run tests
+npm test
+
+# Production build
+npm run build
 ```
 
-For serverless functions locally, use the Vercel CLI:
-```bash
-vercel dev      # Runs frontend + /api/* functions together
-```
+### Local Development Flow
+1. Run `npx ampx sandbox` — this deploys a personal dev backend to AWS and generates `amplify_outputs.json`
+2. Run `npm run dev` in a second terminal — Vite serves the frontend at `http://localhost:5173`
+3. Edit backend files in `amplify/` — the sandbox auto-redeploys changes
+4. Edit frontend files in `src/` — Vite hot-reloads changes
+
+### Deployment
+Push to `main` on GitHub. Amplify Hosting auto-builds and deploys both frontend and backend. No manual steps needed.

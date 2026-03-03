@@ -1,4 +1,48 @@
 .App {
     min-height: 100vh;
-    background: #f1f4f9;
+}
+
+.App ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.submit-btn-wrapper {
+    display: flex;
+    justify-content: space-between;
+    max-width: 620px;
+    margin: 24px auto 40px auto;
+    align-items: center;
+}
+
+.submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    height: auto;
+    align-self: center;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: background 0.2s ease;
+    padding: 10px 20px;
+}
+
+.submit-btn:hover {
+    background: #1d4ed8;
+}
+
+.clear-btn {
+    color: #6b7280;
+}
+
+.clear-btn:hover {
+    color: black;
+    text-decoration: underline;
+    cursor: pointer;
 }

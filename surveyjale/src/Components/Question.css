@@ -1,10 +1,9 @@
 .question-container {
     max-width: 620px;
-    margin: 60px auto;
-    padding: 48px 52px;
+    margin: 0 auto 24px auto;
+    padding: 32px 52px;
     background: #ffffff;
-    border: 1px solid #000000;
-    border-radius: 20px;
+    border-radius: 10px;
     font-family: 'Syne', sans-serif;
     position: relative;
     overflow: hidden;
@@ -12,17 +11,25 @@
 
 
 .question-container h2 {
-    font-family: Arial;
-    font-size: 1.8rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
     font-weight: 600;
     color: #1a1a2e;
-    margin: 0 0 28px 0;
-    line-height: 1.35;
-    letter-spacing: -0.01em;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.question-content-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
 }
 
 .question-textarea-wrapper {
-    margin-bottom: 24px;
+    flex-grow: 1;
+    display: flex;
 }
 
 .question-textarea {
@@ -48,22 +55,22 @@
 
 .question-textarea:focus {
     border-color: #2563eb;
-    background: #ffffff;
 }
 
 .question-record-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 48px;
+    height: 48px;
     background: #2563eb;
     color: #ffffff;
-    padding: 13px 28px;
     border: none;
-    border-radius: 10px;
+    border-radius: 40px;
     cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     transition: background 0.2s ease;
+    flex-shrink: 0;
 }
 
 .question-record-btn:hover {

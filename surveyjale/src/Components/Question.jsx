@@ -1,6 +1,13 @@
 import { useState, useRef } from 'react';
 import './Question.css';
 import { Mic, Square, Loader } from 'lucide-react';
+import { generateClient } from 'aws-amplify/data';
+
+let client;
+function getClient() {
+  if (!client) client = generateClient();
+  return client;
+}
 
 function Question({
   questionNumber = 1,
@@ -33,16 +40,9 @@ function Question({
         setTranscribing(true);
 
         try {
-          // Call your transcribe Lambda
-          // (see Step 10 for how to expose this as an API endpoint)
-          const res = await fetch('/api/transcribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audio: base64 }),
-          });
-          const data = await res.json();
-          if (data.transcript) {
-            onChange(value ? `${value} ${data.transcript}` : data.transcript);
+          const { data } = await getClient().mutations.transcribeAudio({ audio: base64 });
+          if (data) {
+            onChange(value ? `${value} ${data}` : data);
           }
         } catch (err) {
           console.error('Transcription failed:', err);

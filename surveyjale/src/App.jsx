@@ -17,23 +17,13 @@ function App() {
   // Fetch questions from DynamoDB on load
   useEffect(() => {
     // TODO: Uncomment as this is how questions are fetched from DynamoDB
-    // async function fetchQuestions() {
-    //   const { data } = await client.models.Question.list();
-    //   const sorted = [...data].sort((a, b) => a.order - b.order);
-    //   setQuestions(sorted);
-    //   setResponses(new Array(sorted.length).fill(''));
-    // }
-    // fetchQuestions();
-
-    // TODO: =======================
-    // Temp Mock Data
-    const mockQuestions = [
-      { id: '1', text: 'What is your name?', order: 1 },
-      { id: '2', text: 'What is your favorite color?', order: 2 },
-      { id: '3', text: 'What is your favorite food?', order: 3 },
-    ];
-    setQuestions(mockQuestions);
-    setResponses(new Array(mockQuestions.length).fill(''));
+    async function fetchQuestions() {
+      const { data } = await client.models.Question.list();
+      const sorted = [...data].sort((a, b) => a.order - b.order);
+      setQuestions(sorted);
+      setResponses(new Array(sorted.length).fill(''));
+    }
+    fetchQuestions();
   }, []);
 
   const handleResponseChange = (index, value) => {

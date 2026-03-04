@@ -17,14 +17,9 @@ const s3Client = new S3Client({});
 const BUCKET_NAME = env.STORAGE_BUCKET_NAME;
 
 export const handler = async(event:any) => {
-    const body = JSON.parse(event.body || '{}');
-    const{audio} = body;
+    const audio = event.arguments?.audio;
     if(!audio || typeof audio !== 'string'){
-        return{
-            statuscode: 400,
-            headers:{'Content-Type':'application/json', 'Access-Control-Allow-Origin':'*'},
-            body: JSON.stringify({error: 'audio field required (base64 string)'})
-        };
+        throw new Error('audio field required (base64 string)');
     }
 
     const audioBuffer = Buffer.from(audio, 'base64');
@@ -96,14 +91,7 @@ export const handler = async(event:any) => {
         );
     }
 
-    return {
-        statusCode: 200,
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({ transcript }),
-    };
+    return transcript;
 
 }
 

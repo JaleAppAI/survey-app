@@ -2,22 +2,27 @@ import './App.css';
 import Question from './Components/Question';
 import FormHeader from './Components/FormHeader';
 import { Send } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/data';
 
-const questions = [
-  { id: 1, text: "How satisfied are you with our service overall?" },
-  { id: 2, text: "What did we do well during your experience with us?" },
-  { id: 3, text: "What could we have done better?" },
-  { id: 4, text: "How likely are you to recommend us to a friend or colleague?" },
-  { id: 5, text: "Is there anything else you would like to share with us?" },
-];
-
-
+const client = generateClient();
 
 function App() {
-  const [responses, setResponses] = useState(
-    new Array(questions.length).fill('')
-  );
+  const [questions, setQuestions] = useState([]);
+  const [responses, setResponses] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  // Fetch questions from DynamoDB on load
+  useEffect(() => {
+    async function fetchQuestions() {
+      const { data } = await client.models.Question.list();
+      const sorted = [...data].sort((a, b) => a.order - b.order);
+      setQuestions(sorted);
+      setResponses(new Array(sorted.length).fill(''));
+    }
+    fetchQuestions();
+  }, []);
 
   const handleResponseChange = (index, value) => {
     const newResponses = [...responses];
@@ -25,20 +30,52 @@ function App() {
     setResponses(newResponses);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(responses);
+    setSubmitting(true);
+
+    try {
+      // Submit each response to DynamoDB
+      await Promise.all(
+        questions.map((q, index) =>
+          client.models.Response.create({
+            questionId: q.id,
+            responseText: responses[index],
+          })
+        )
+      );
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Submit failed:', err);
+      alert('Failed to submit. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleClear = () => {
-    console.log('Clear');
     setResponses(new Array(questions.length).fill(''));
   };
+
+  if (submitted) {
+    return (
+      <div className="App">
+        <div style={{
+          maxWidth: 620,
+          margin: '80px auto',
+          textAlign: 'center',
+          fontFamily: 'Syne, sans-serif'
+        }}>
+          <h1>Thank you!</h1>
+          <p>Your responses have been submitted.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
       <FormHeader />
-      {/* Questions Section */}
       <ul>
         {questions.map((q, index) => (
           <li key={q.id}>
@@ -51,13 +88,16 @@ function App() {
           </li>
         ))}
       </ul>
-      {/* Submit section */}
-      <div className='submit-btn-wrapper'>
-        <button className='submit-btn' onClick={handleSubmit}>
+      <div className="submit-btn-wrapper">
+        <button
+          className="submit-btn"
+          onClick={handleSubmit}
+          disabled={submitting}
+        >
           <Send size={18} />
-          Submit
+          {submitting ? 'Submitting...' : 'Submit'}
         </button>
-        <p className='clear-btn' onClick={handleClear}>
+        <p className="clear-btn" onClick={handleClear}>
           Clear Form
         </p>
       </div>

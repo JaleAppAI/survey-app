@@ -3,6 +3,7 @@ import Question from './Components/Question';
 import FormHeader from './Components/FormHeader';
 import { Send } from 'lucide-react';
 import { useState, useEffect } from 'react';
+// TODO: Uncomment for amplify to work
 import { generateClient } from 'aws-amplify/data';
 
 const client = generateClient();
@@ -15,13 +16,24 @@ function App() {
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
-    async function fetchQuestions() {
-      const { data } = await client.models.Question.list();
-      const sorted = [...data].sort((a, b) => a.order - b.order);
-      setQuestions(sorted);
-      setResponses(new Array(sorted.length).fill(''));
-    }
-    fetchQuestions();
+    // TODO: Uncomment as this is how questions are fetched from DynamoDB
+    // async function fetchQuestions() {
+    //   const { data } = await client.models.Question.list();
+    //   const sorted = [...data].sort((a, b) => a.order - b.order);
+    //   setQuestions(sorted);
+    //   setResponses(new Array(sorted.length).fill(''));
+    // }
+    // fetchQuestions();
+
+    // TODO: =======================
+    // Temp Mock Data
+    const mockQuestions = [
+      { id: '1', text: 'What is your name?', order: 1 },
+      { id: '2', text: 'What is your favorite color?', order: 2 },
+      { id: '3', text: 'What is your favorite food?', order: 3 },
+    ];
+    setQuestions(mockQuestions);
+    setResponses(new Array(mockQuestions.length).fill(''));
   }, []);
 
   const handleResponseChange = (index, value) => {

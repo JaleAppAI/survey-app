@@ -1,11 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Amplify } from 'aws-amplify'
-import outputs from '../amplify/outputs.json'
 import './index.css'
 import App from './App.jsx'
+// TODO: Uncomment for amplify to work
+// import { Amplify } from 'aws-amplify'
+// import outputs from '../amplify/outputs.json'
 
-Amplify.configure(outputs);
+// Amplify.configure(outputs);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

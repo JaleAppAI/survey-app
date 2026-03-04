@@ -76,3 +76,30 @@
 .question-record-btn:hover {
     background: #1d4ed8;
 }
+
+/* Small mobiles css */
+@media only screen and (max-width: 600px) {
+    .question-container {
+        padding: 20px 20px;
+        margin: 25px 20px;
+    }
+
+    .question-container h2 {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .question-textarea {
+        min-height: 80px;
+        font-size: .85rem;
+    }
+
+    .question-content-wrapper {
+        gap: 10px;
+    }
+
+    .question-record-btn {
+        width: 40px;
+        height: 40px;
+    }
+}

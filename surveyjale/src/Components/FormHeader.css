@@ -31,10 +31,24 @@
     font-size: 2rem;
     align-items: center;
     gap: 4px;
+    padding-top: 15px;
 }
 
 .text-required {
     font-family: 'Syne', sans-serif;
     color: red;
     padding-left: .2rem;
+}
+
+/* Small mobiles css */
+@media only screen and (max-width: 600px) {
+    .form-header {
+        padding: 20px 20px;
+        margin: 25px 20px;
+    }
+
+    .text-required-warning {
+        padding-top: 15px;
+    }
+
 }

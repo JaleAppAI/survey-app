@@ -1,0 +1,117 @@
+.user-info-step {
+    display: flex;
+    justify-content: center;
+    padding: 80px 20px;
+}
+
+.user-info-card {
+    background-color: white;
+    border: 1px solid #dde3ed;
+    border-radius: 10px;
+    padding: 40px 52px;
+    width: 100%;
+    max-width: 520px;
+}
+
+.user-info-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.02em;
+}
+
+.user-info-subtitle {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0 0 32px 0;
+    line-height: 1.6;
+}
+
+.user-info-field {
+    margin-bottom: 24px;
+}
+
+.user-info-label {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.user-info-optional {
+    font-weight: 400;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.user-info-required {
+    color: #ef4444;
+}
+
+.user-info-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    color: #1a1a2e;
+    border: 1px solid #dde3ed;
+    border-radius: 6px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.user-info-input:focus {
+    border-color: #2563eb;
+}
+
+.user-info-input--error {
+    border-color: #ef4444;
+}
+
+.user-info-error {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    color: #ef4444;
+    margin: 6px 0 0 0;
+}
+
+.user-info-btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background-color: #2563eb;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.user-info-btn:hover:not(:disabled) {
+    background-color: #1d4ed8;
+}
+
+.user-info-btn:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+}
+
+@media only screen and (max-width: 600px) {
+    .user-info-step {
+        padding: 40px 0;
+    }
+
+    .user-info-card {
+        padding: 28px 20px;
+        margin: 0 20px;
+    }
+}

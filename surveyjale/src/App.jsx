@@ -1,6 +1,7 @@
 import './App.css';
 import Question from './Components/Question';
 import FormHeader from './Components/FormHeader';
+import UserInfoStep from './Components/UserInfoStep';
 import { Send } from 'lucide-react';
 import { useState, useEffect } from 'react';
 // TODO: Uncomment for amplify to work
@@ -9,10 +10,12 @@ import { generateClient } from 'aws-amplify/data';
 const client = generateClient();
 
 function App() {
+  const [step, setStep] = useState('info'); // 'info' | 'survey' | 'submitted'
+  const [respondentName, setRespondentName] = useState('');
+  const [respondentEmail, setRespondentEmail] = useState('');
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
@@ -26,6 +29,12 @@ function App() {
     fetchQuestions();
   }, []);
 
+  const handleInfoComplete = (name, email) => {
+    setRespondentName(name);
+    setRespondentEmail(email);
+    setStep('survey');
+  };
+
   const handleResponseChange = (index, value) => {
     const newResponses = [...responses];
     newResponses[index] = value;
@@ -37,16 +46,18 @@ function App() {
     setSubmitting(true);
 
     try {
-      // Submit each response to DynamoDB
-      await Promise.all(
-        questions.map((q, index) =>
-          client.models.Response.create({
+      await client.models.Submission.create({
+        respondentName: respondentName || undefined,
+        respondentEmail,
+        responses: JSON.stringify(
+          questions.map((q, index) => ({
             questionId: q.id,
+            questionText: q.text,
             responseText: responses[index],
-          })
-        )
-      );
-      setSubmitted(true);
+          }))
+        ),
+      });
+      setStep('submitted');
     } catch (err) {
       console.error('Submit failed:', err);
       alert('Failed to submit. Please try again.');
@@ -59,7 +70,15 @@ function App() {
     setResponses(new Array(questions.length).fill(''));
   };
 
-  if (submitted) {
+  if (step === 'info') {
+    return (
+      <div className="App">
+        <UserInfoStep onComplete={handleInfoComplete} />
+      </div>
+    );
+  }
+
+  if (step === 'submitted') {
     return (
       <div className="App">
         <div style={{

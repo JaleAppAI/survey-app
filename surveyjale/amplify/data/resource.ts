@@ -13,10 +13,11 @@ const schema = a.schema({
       allow.authenticated().to(['read']),
     ]),
 
-  Response: a
+  Submission: a
     .model({
-      questionId: a.string().required(),
-      responseText: a.string().required(),
+      respondentName: a.string(),
+      respondentEmail: a.string().required(),
+      responses: a.json().required(),
     })
     .authorization((allow) => [
       allow.guest().to(['create', 'read']),

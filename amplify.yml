@@ -3,15 +3,15 @@ frontend:
   phases:
     preBuild:
       commands:
-        - cd surveyjale && npm ci --cache .npm --prefer-offline
+        - npm ci --cache .npm --prefer-offline
     build:
       commands:
-        - cd surveyjale && npm run build
+        - npm run build
   artifacts:
-    baseDirectory: surveyjale/dist
+    baseDirectory: dist
     files:
       - '**/*'
   cache:
     paths:
-      - surveyjale/node_modules/**/*
-      - surveyjale/.npm/**/*
+      - node_modules/**/*
+      - .npm/**/*

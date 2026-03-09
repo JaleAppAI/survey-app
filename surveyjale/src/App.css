@@ -8,6 +8,86 @@
     padding: 0;
 }
 
+/* Progress bar */
+.progress-wrapper {
+    max-width: 620px;
+    margin: 0 auto 8px auto;
+    padding: 0 0 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.progress-bar-track {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #2563eb;
+    border-radius: 99px;
+    transition: width 0.3s ease;
+}
+
+.progress-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.78rem;
+    color: #6b7280;
+    align-self: flex-end;
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+    0% { background-position: -600px 0; }
+    100% { background-position: 600px 0; }
+}
+
+.skeleton-card {
+    max-width: 620px;
+    margin: 0 auto 24px auto;
+    padding: 32px 52px;
+    background: #ffffff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeleton-line {
+    border-radius: 6px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite linear;
+}
+
+.skeleton-title {
+    height: 20px;
+    width: 70%;
+}
+
+.skeleton-body {
+    height: 80px;
+    width: 100%;
+}
+
+.skeleton-body--short {
+    height: 14px;
+    width: 40%;
+}
+
+/* Submit error */
+.submit-error-msg {
+    max-width: 620px;
+    margin: 0 auto 12px auto;
+    color: #ef4444;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
 .submit-btn-wrapper {
     display: flex;
     justify-content: space-between;
@@ -50,5 +130,14 @@
 @media only screen and (max-width: 600px) {
     .submit-btn-wrapper {
         padding: 0 20px;
+    }
+
+    .progress-wrapper {
+        padding: 0 20px 16px 20px;
+    }
+
+    .skeleton-card {
+        margin: 25px 20px;
+        padding: 20px 20px;
     }
 }

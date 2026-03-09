@@ -13,7 +13,8 @@ function Question({
   questionNumber = 1,
   questionText = "What is your response?",
   value,
-  onChange
+  onChange,
+  hasError = false,
 }) {
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
@@ -33,7 +34,6 @@ function Question({
       const blob = new Blob(chunks.current, { type: 'audio/webm' });
       stream.getTracks().forEach((t) => t.stop());
 
-      // Convert to base64
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64 = reader.result.split(',')[1];
@@ -63,15 +63,18 @@ function Question({
   };
 
   return (
-    <div className="question-container form-card-shadow">
+    <div className={`question-container form-card-shadow${hasError ? ' question-container--error' : ''}`}>
       <h2>
         {questionNumber}. {questionText}
         <span className="text-required"> *</span>
       </h2>
+      {hasError && (
+        <p className="question-error-msg">This question requires a response.</p>
+      )}
       <div className="question-content-wrapper">
         <div className="question-textarea-wrapper">
           <textarea
-            className="question-textarea"
+            className={`question-textarea${hasError ? ' question-textarea--error' : ''}`}
             placeholder="Type your response here..."
             value={value}
             onChange={(e) => onChange(e.target.value)}

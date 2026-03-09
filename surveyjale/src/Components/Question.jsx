@@ -13,7 +13,8 @@ function Question({
   questionNumber = 1,
   questionText = "What is your response?",
   value,
-  onChange
+  onChange,
+  hasError = false
 }) {
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
@@ -63,23 +64,25 @@ function Question({
   };
 
   return (
-    <div className="question-container form-card-shadow">
+    <div className={`question-container form-card-shadow${hasError ? ' question-container--error' : ''}`}>
       <h2>
-        {questionNumber}. {questionText}
+        <span className="question-number">{questionNumber}</span>
+        {questionText}
         <span className="text-required"> *</span>
       </h2>
       <div className="question-content-wrapper">
         <div className="question-textarea-wrapper">
           <textarea
-            className="question-textarea"
+            className={`question-textarea${hasError ? ' question-textarea--error' : ''}`}
             placeholder="Type your response here..."
             value={value}
             onChange={(e) => onChange(e.target.value)}
           />
+          {hasError && <p className="question-error-msg">This field is required.</p>}
         </div>
         <button
           onClick={recording ? stopRecording : startRecording}
-          className="question-record-btn"
+          className={`question-record-btn${recording ? ' recording' : ''}`}
           disabled={transcribing}
           style={{
             background: recording ? '#ef4444' : transcribing ? '#9ca3af' : '#2563eb',

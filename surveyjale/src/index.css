@@ -1,24 +1,33 @@
 @layer base {
   :root {
-    background-color: #F3F5F7;
+    background-color: #D4DCE6;
   }
 }
 
 @layer utilities {
   .form-card-shadow {
-    box-shadow: 0 2px 4px 0 hsl(0 0% 0% / 0.06), 0 1px 3px 0 hsl(0 0% 0% / 0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
   }
 
   .form-card-shadow:hover {
-    box-shadow: 0 2px 6px 0 hsl(0 0% 0% / 0.08), 0 2px 8px 0 hsl(0 0% 0% / 0.12);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04);
+    transform: translateY(-2px);
   }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #D4DCE6;
+  background-image: radial-gradient(circle, #a8b5c5 1px, transparent 1px);
+  background-size: 24px 24px;
 }

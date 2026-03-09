@@ -2,6 +2,7 @@ import './App.css';
 import Question from './Components/Question';
 import FormHeader from './Components/FormHeader';
 import UserInfoStep from './Components/UserInfoStep';
+import SuccessStep from './Components/SuccessStep';
 import { Send } from 'lucide-react';
 import { useState, useEffect } from 'react';
 // TODO: Uncomment for amplify to work
@@ -18,6 +19,7 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState([]);
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
@@ -43,11 +45,26 @@ function App() {
     const newResponses = [...responses];
     newResponses[index] = value;
     setResponses(newResponses);
+    if (errors[index]) {
+      const newErrors = [...errors];
+      newErrors[index] = false;
+      setErrors(newErrors);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+
+    const newErrors = responses.map(r => !r.trim());
+    if (newErrors.some(Boolean)) {
+      setErrors(newErrors);
+      setTimeout(() => {
+        document.querySelector('.question-container--error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 0);
+      setSubmitting(false);
+      return;
+    }
 
     try {
       await client.models.Submission.create({
@@ -100,19 +117,7 @@ function App() {
   }
 
   if (step === 'submitted') {
-    return (
-      <div className="App">
-        <div style={{
-          maxWidth: 620,
-          margin: '80px auto',
-          textAlign: 'center',
-          fontFamily: 'Syne, sans-serif'
-        }}>
-          <h1>Thank you!</h1>
-          <p>Your responses have been submitted.</p>
-        </div>
-      </div>
-    );
+    return <div className="App"><SuccessStep name={respondentName} /></div>;
   }
 
   return (
@@ -126,6 +131,7 @@ function App() {
               questionText={q.text}
               value={responses[index]}
               onChange={(value) => handleResponseChange(index, value)}
+              hasError={errors[index] || false}
             />
           </li>
         ))}

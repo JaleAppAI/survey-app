@@ -6,8 +6,8 @@
 
 .user-info-card {
     background-color: white;
-    border: 1px solid #dde3ed;
-    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    border-radius: 16px;
     padding: 40px 52px;
     width: 100%;
     max-width: 520px;
@@ -16,10 +16,10 @@
 .user-info-title {
     font-family: 'Syne', sans-serif;
     font-size: 1.7rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #1a1a2e;
     margin: 0 0 8px 0;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
 }
 
 .user-info-subtitle {
@@ -60,14 +60,15 @@
     font-size: 1rem;
     color: #1a1a2e;
     border: 1px solid #dde3ed;
-    border-radius: 6px;
+    border-radius: 10px;
     outline: none;
     box-sizing: border-box;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .user-info-input:focus {
     border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .user-info-input--error {
@@ -89,19 +90,22 @@
     font-size: 1rem;
     font-weight: 600;
     color: white;
-    background-color: #2563eb;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     border: none;
-    border-radius: 6px;
+    border-radius: 999px;
     cursor: pointer;
-    transition: background-color 0.15s;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .user-info-btn:hover:not(:disabled) {
-    background-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .user-info-btn:disabled {
-    background-color: #93c5fd;
+    background: #93c5fd;
+    box-shadow: none;
     cursor: not-allowed;
 }
 

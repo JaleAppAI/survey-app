@@ -9,6 +9,8 @@ import { generateClient } from 'aws-amplify/data';
 
 const client = generateClient();
 
+const surveyId = new URLSearchParams(window.location.search).get('survey');
+
 function App() {
   const [step, setStep] = useState('info'); // 'info' | 'survey' | 'submitted'
   const [respondentName, setRespondentName] = useState('');
@@ -19,9 +21,11 @@ function App() {
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
-    // TODO: Uncomment as this is how questions are fetched from DynamoDB
+    if (!surveyId) return;
     async function fetchQuestions() {
-      const { data } = await client.models.Question.list();
+      const { data } = await client.models.Question.list({
+        filter: { surveyId: { eq: surveyId } },
+      });
       const sorted = [...data].sort((a, b) => a.order - b.order);
       setQuestions(sorted);
       setResponses(new Array(sorted.length).fill(''));
@@ -56,6 +60,7 @@ function App() {
             responseText: responses[index],
           }))
         ),
+        surveyId,
       });
       setStep('submitted');
     } catch (err) {
@@ -69,6 +74,22 @@ function App() {
   const handleClear = () => {
     setResponses(new Array(questions.length).fill(''));
   };
+
+  if (!surveyId) {
+    return (
+      <div className="App">
+        <div style={{
+          maxWidth: 620,
+          margin: '80px auto',
+          textAlign: 'center',
+          fontFamily: 'Syne, sans-serif'
+        }}>
+          <h1>Invalid survey link</h1>
+          <p>Please use the link provided to you to access this survey.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (step === 'info') {
     return (

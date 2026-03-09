@@ -2,15 +2,28 @@ import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 import { transcribeFunction } from '../functions/transcribe/resource';
 
 const schema = a.schema({
+  Survey: a
+    .model({
+      name: a.string().required(),
+      questions: a.hasMany('Question', 'surveyId'),
+      submissions: a.hasMany('Submission', 'surveyId'),
+    })
+    .authorization((allow) => [
+      allow.guest().to(['read']),
+      allow.authenticated().to(['read', 'create', 'update']),
+    ]),
+
   Question: a
     .model({
       text: a.string().required(),
       order: a.integer().required(),
       conditions: a.json(),
+      surveyId: a.id().required(),
+      survey: a.belongsTo('Survey', 'surveyId'),
     })
     .authorization((allow) => [
       allow.guest().to(['read']),
-      allow.authenticated().to(['read']),
+      allow.authenticated().to(['read', 'create', 'update']),
     ]),
 
   Submission: a
@@ -18,6 +31,8 @@ const schema = a.schema({
       respondentName: a.string(),
       respondentEmail: a.string().required(),
       responses: a.json().required(),
+      surveyId: a.id().required(),
+      survey: a.belongsTo('Survey', 'surveyId'),
     })
     .authorization((allow) => [
       allow.guest().to(['create', 'read']),

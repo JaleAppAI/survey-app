@@ -1,12 +1,25 @@
 import { SignatureV4 } from '@smithy/signature-v4';
 import { HttpRequest } from '@smithy/protocol-http';
 import { Hash } from '@smithy/hash-node';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { fromNodeProviderChain } = require('@aws-sdk/credential-providers/dist-cjs/index.js');
 
-const APPSYNC_URL = 'https://ozp5cb2etvcg3osfr4xwbfth7y.appsync-api.us-east-2.amazonaws.com/graphql';
-const REGION = 'us-east-2';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const outputs = JSON.parse(readFileSync(join(__dirname, 'amplify_outputs.json'), 'utf8'));
+
+const args = process.argv.slice(2);
+
+// --api-url overrides the amplify_outputs.json URL (useful for targeting specific envs)
+const apiUrlIdx = args.indexOf('--api-url');
+const APPSYNC_URL = apiUrlIdx !== -1 && args[apiUrlIdx + 1]
+    ? args[apiUrlIdx + 1]
+    : outputs.data.url;
+
+const REGION = outputs.data.aws_region ?? 'us-east-2';
 
 const questions = [
     // Phase 1: Context & Workflow
@@ -31,7 +44,6 @@ const questions = [
 ];
 
 // Parse CLI args
-const args = process.argv.slice(2);
 const nameIdx = args.indexOf('--name');
 const surveyName = nameIdx !== -1 && args[nameIdx + 1]
     ? args[nameIdx + 1]

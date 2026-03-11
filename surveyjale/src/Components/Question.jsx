@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './Question.css';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import VoiceRecorder from './VoiceRecorder';
@@ -6,11 +7,21 @@ function Question({
     questionNumber = 1,
     questionText = "What is your response?",
     value,
-    onChange
+    onChange,
+    inputRef,
+    onVoiceCommand
 }) {
+    const [liveFinal, setLiveFinal] = useState("");
+    const [livePartial, setLivePartial] = useState("");
+
     const handleTranscriptConfirmed = (text) => {
         onChange(value ? `${value} ${text}` : text);
     };
+
+    const hasLiveAudio = liveFinal || livePartial;
+    const displayValue = hasLiveAudio
+        ? `${value ? value + ' ' : ''}${liveFinal} ${livePartial}`.replace(/\s+/g, ' ').trim()
+        : value;
 
     return (
         <div className="question-container form-card-shadow">
@@ -21,9 +32,11 @@ function Question({
             <div className="question-content-wrapper">
                 <div className="question-textarea-wrapper">
                     <textarea
+                        ref={inputRef}
                         className="question-textarea"
                         placeholder="Type your response here..."
-                        value={value}
+                        value={displayValue}
+                        readOnly={!!hasLiveAudio}
                         onChange={(e) => onChange(e.target.value)}
                     />
                 </div>
@@ -36,6 +49,12 @@ function Question({
                     return credentials;
                 }}
                 onTranscriptConfirmed={handleTranscriptConfirmed}
+                onVoiceCommand={onVoiceCommand}
+                onLiveTranscriptChange={(final, partial) => {
+                    setLiveFinal(final);
+                    setLivePartial(partial);
+                }}
+                onTranscriptCleared={() => onChange('')}
             />
         </div>
     );

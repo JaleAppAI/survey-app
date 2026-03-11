@@ -3,7 +3,7 @@ import Question from './Components/Question';
 import FormHeader from './Components/FormHeader';
 import UserInfoStep from './Components/UserInfoStep';
 import { Send } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // TODO: Uncomment for amplify to work
 import { generateClient } from 'aws-amplify/data';
 
@@ -16,6 +16,7 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const questionRefs = useRef([]);
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
@@ -41,29 +42,43 @@ function App() {
     setResponses(newResponses);
   };
 
+  const handleVoiceCommand = (index, command) => {
+    if (command === 'NEXT_QUESTION') {
+      if (index + 1 < questions.length) {
+        questionRefs.current[index + 1]?.focus();
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
-      await client.models.Submission.create({
-        respondentName: respondentName || undefined,
-        respondentEmail,
-        responses: JSON.stringify(
-          questions.map((q, index) => ({
-            questionId: q.id,
-            questionText: q.text,
-            responseText: responses[index],
-          }))
-        ),
-      });
-      setStep('submitted');
+      console.log(responses);
     } catch (err) {
       console.error('Submit failed:', err);
       alert('Failed to submit. Please try again.');
-    } finally {
-      setSubmitting(false);
     }
+    // try {
+    //   await client.models.Submission.create({
+    //     respondentName: respondentName || undefined,
+    //     respondentEmail,
+    //     responses: JSON.stringify(
+    //       questions.map((q, index) => ({
+    //         questionId: q.id,
+    //         questionText: q.text,
+    //         responseText: responses[index],
+    //       }))
+    //     ),
+    //   });
+    //   setStep('submitted');
+    // } catch (err) {
+    //   console.error('Submit failed:', err);
+    //   alert('Failed to submit. Please try again.');
+    // } finally {
+    //   setSubmitting(false);
+    // }
   };
 
   const handleClear = () => {
@@ -101,10 +116,12 @@ function App() {
         {questions.map((q, index) => (
           <li key={q.id}>
             <Question
+              inputRef={(el) => (questionRefs.current[index] = el)}
               questionNumber={index + 1}
               questionText={q.text}
               value={responses[index]}
               onChange={(value) => handleResponseChange(index, value)}
+              onVoiceCommand={(command) => handleVoiceCommand(index, command)}
             />
           </li>
         ))}

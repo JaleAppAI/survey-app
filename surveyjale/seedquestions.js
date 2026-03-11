@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { fromNodeProviderChain } = require('@aws-sdk/credential-providers/dist-cjs/index.js');
 
-const APPSYNC_URL = 'https://ozp5cb2etvcg3osfr4xwbfth7y.appsync-api.us-east-2.amazonaws.com/graphql';
+const APPSYNC_URL = 'https://uol5s75hmzfc3mnovu7aj2ozt4.appsync-api.us-east-2.amazonaws.com/graphql';
 const REGION = 'us-east-2';
 
 const questions = [

@@ -30,11 +30,17 @@ function pcmEncode(float32Array) {
  * @param {() => Promise<{accessKeyId, secretAccessKey, sessionToken}>} options.getCredentials
  * @param {number} [options.maxDurationMs=120000] - Max recording duration in ms (default 2 min)
  */
-export function useRealtimeTranscription({ region, languageOptions, getCredentials, maxDurationMs = 120000 }) {
+export function useRealtimeTranscription({ region, languageOptions, getCredentials, maxDurationMs = 120000, onVoiceCommand }) {
     const [partialTranscript, setPartialTranscript] = useState('');
+    const partialTranscriptRef = useRef('');
     const [finalTranscript, setFinalTranscript] = useState('');
     const [isRecording, setIsRecording] = useState(false);
     const [error, setError] = useState(null);
+
+    const updatePartial = useCallback((val) => {
+        setPartialTranscript(val);
+        partialTranscriptRef.current = val;
+    }, []);
 
     const audioContextRef = useRef(null);
     const sourceRef = useRef(null);
@@ -61,7 +67,7 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
     const startRecording = useCallback(async () => {
         try {
             setError(null);
-            setPartialTranscript('');
+            updatePartial('');
             isStoppedRef.current = false;
             audioBufferQueueRef.current = [];
 
@@ -163,10 +169,35 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
                 for (const result of results) {
                     const transcript = result.Alternatives?.[0]?.Transcript || '';
                     if (result.IsPartial) {
-                        setPartialTranscript(transcript);
+                        const lowerTranscript = transcript.toLowerCase();
+                        if (lowerTranscript.includes('next question')) {
+                            const withoutCommand = transcript.substring(0, lowerTranscript.indexOf('next question'));
+                            let updatedFinal = finalTranscript;
+                            if (withoutCommand.trim()) {
+                                updatedFinal = (finalTranscript ? finalTranscript + ' ' : '') + withoutCommand.trim();
+                                setFinalTranscript(updatedFinal);
+                            }
+                            updatePartial('');
+                            onVoiceCommand?.('NEXT_QUESTION', updatedFinal);
+                            break;
+                        }
+                        updatePartial(transcript);
                     } else {
+                        const lowerTranscript = transcript.toLowerCase();
+                        if (lowerTranscript.includes('next question')) {
+                            const withoutCommand = transcript.substring(0, lowerTranscript.indexOf('next question'));
+                            let updatedFinal = finalTranscript;
+                            if (withoutCommand.trim()) {
+                                updatedFinal = (finalTranscript ? finalTranscript + ' ' : '') + withoutCommand.trim();
+                                setFinalTranscript(updatedFinal);
+                            }
+                            updatePartial('');
+                            onVoiceCommand?.('NEXT_QUESTION', updatedFinal);
+                            break;
+                        }
+
                         setFinalTranscript((prev) => (prev ? prev + ' ' : '') + transcript);
-                        setPartialTranscript('');
+                        updatePartial('');
                     }
                 }
             }
@@ -180,7 +211,7 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
             setIsRecording(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [region, languageOptions, getCredentials, pushAudioChunk, maxDurationMs]);
+    }, [region, languageOptions, getCredentials, pushAudioChunk, maxDurationMs, onVoiceCommand]);
 
     const stopRecording = useCallback(() => {
         isStoppedRef.current = true;
@@ -216,22 +247,21 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
         setIsRecording(false);
 
         // Promote any remaining partial to final
-        setPartialTranscript((partial) => {
-            if (partial) {
-                setFinalTranscript((prev) => (prev ? prev + ' ' : '') + partial);
-            }
-            return '';
-        });
-    }, []);
+        const remainingPartial = partialTranscriptRef.current;
+        if (remainingPartial) {
+            setFinalTranscript((prev) => (prev ? prev + ' ' : '') + remainingPartial);
+        }
+        updatePartial('');
+    }, [updatePartial]);
 
     // Keep ref in sync so the timeout can always call the latest stopRecording
     stopRecordingRef.current = stopRecording;
 
     const resetTranscript = useCallback(() => {
-        setPartialTranscript('');
+        updatePartial('');
         setFinalTranscript('');
         setError(null);
-    }, []);
+    }, [updatePartial]);
 
     // Cleanup on unmount
     useEffect(() => {

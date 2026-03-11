@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRealtimeTranscription } from '../hooks/useRealtimeTranscription';
 import { Mic, Square, Check, RotateCcw } from 'lucide-react';
 import './VoiceRecorder.css';
@@ -8,7 +8,20 @@ export default function VoiceRecorder({
     languageOptions,
     getCredentials,
     onTranscriptConfirmed,
+    onVoiceCommand,
+    onLiveTranscriptChange,
+    onTranscriptCleared,
 }) {
+    const handleVoiceCommand = (command, finalTranscriptParam) => {
+        if (command === 'NEXT_QUESTION') {
+            stopRecording();
+            setConfirmed(true);
+            onTranscriptConfirmed?.(finalTranscriptParam !== undefined ? finalTranscriptParam : finalTranscript);
+            resetTranscript();
+            onVoiceCommand?.(command);
+        }
+    };
+
     const {
         partialTranscript,
         finalTranscript,
@@ -17,7 +30,12 @@ export default function VoiceRecorder({
         startRecording,
         stopRecording,
         resetTranscript,
-    } = useRealtimeTranscription({ region, languageOptions, getCredentials });
+    } = useRealtimeTranscription({
+        region,
+        languageOptions,
+        getCredentials,
+        onVoiceCommand: handleVoiceCommand
+    });
 
     const [confirmed, setConfirmed] = useState(false);
 
@@ -30,7 +48,12 @@ export default function VoiceRecorder({
     const handleReRecord = () => {
         setConfirmed(false);
         resetTranscript();
+        onTranscriptCleared?.();
     };
+
+    useEffect(() => {
+        onLiveTranscriptChange?.(finalTranscript, partialTranscript);
+    }, [finalTranscript, partialTranscript, onLiveTranscriptChange]);
 
     return (
         <div className="voice-recorder">
@@ -42,22 +65,6 @@ export default function VoiceRecorder({
                     Recording — speak now
                 </div>
             )}
-
-            <div className="voice-recorder-transcript-box">
-                {finalTranscript && (
-                    <span className="voice-recorder-final">{finalTranscript}</span>
-                )}
-                {partialTranscript && (
-                    <span className="voice-recorder-partial"> {partialTranscript}</span>
-                )}
-                {!finalTranscript && !partialTranscript && (
-                    <span className="voice-recorder-placeholder">
-                        {isRecording
-                            ? 'Listening...'
-                            : 'Your response will appear here as you speak'}
-                    </span>
-                )}
-            </div>
 
             <div className="voice-recorder-controls">
                 {confirmed ? (

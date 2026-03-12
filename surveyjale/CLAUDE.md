@@ -1,6 +1,6 @@
 # SurveyJale — CLAUDE.md
 
-> **Before starting any work, read [`ai/workflow.md`](ai/workflow.md) for task management rules and operating principles.**
+**Before starting any work, read [`ai/workflow.md`](ai/workflow.md) for task management rules and operating principles.**
 
 ---
 

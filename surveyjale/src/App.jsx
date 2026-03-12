@@ -5,39 +5,53 @@ import UserInfoStep from './Components/UserInfoStep';
 import SuccessStep from './Components/SuccessStep';
 import { Send } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Routes, Route, useSearchParams } from 'react-router-dom';
 // TODO: Uncomment for amplify to work
 import { generateClient } from 'aws-amplify/data';
+import AdminPage from './pages/AdminPage';
 
 const client = generateClient();
 
-const surveyId = new URLSearchParams(window.location.search).get('survey');
+function SurveyApp() {
+  const [searchParams] = useSearchParams();
+  const surveyId = searchParams.get('survey');
 
-function App() {
   const [step, setStep] = useState('info'); // 'info' | 'survey' | 'submitted'
   const [respondentName, setRespondentName] = useState('');
   const [respondentEmail, setRespondentEmail] = useState('');
+  const [respondentIndustry, setRespondentIndustry] = useState('');
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [fetchError, setFetchError] = useState(false);
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
     if (!surveyId) return;
     async function fetchQuestions() {
-      const { data } = await client.models.Question.list({
-        filter: { surveyId: { eq: surveyId } },
-      });
-      const sorted = [...data].sort((a, b) => a.order - b.order);
-      setQuestions(sorted);
-      setResponses(new Array(sorted.length).fill(''));
+      try {
+        const { data } = await client.models.Question.list({
+          filter: { surveyId: { eq: surveyId } },
+        });
+        const sorted = [...data].filter(Boolean).sort((a, b) => a.order - b.order);
+        if (sorted.length === 0) {
+          console.warn('No questions returned for surveyId:', surveyId);
+        }
+        setQuestions(sorted);
+        setResponses(new Array(sorted.length).fill(''));
+      } catch (err) {
+        console.error('fetchQuestions failed:', err);
+        setFetchError(true);
+      }
     }
     fetchQuestions();
-  }, []);
+  }, [surveyId]);
 
-  const handleInfoComplete = (name, email) => {
+  const handleInfoComplete = (name, email, industry) => {
     setRespondentName(name);
     setRespondentEmail(email);
+    setRespondentIndustry(industry);
     setStep('survey');
   };
 
@@ -68,8 +82,9 @@ function App() {
 
     try {
       await client.models.Submission.create({
-        respondentName: respondentName || undefined,
+        respondentName,
         respondentEmail,
+        respondentIndustry,
         responses: JSON.stringify(
           questions.map((q, index) => ({
             questionId: q.id,
@@ -120,6 +135,22 @@ function App() {
     return <div className="App"><SuccessStep name={respondentName} /></div>;
   }
 
+  if (fetchError || (step === 'survey' && questions.length === 0)) {
+    return (
+      <div className="App">
+        <div style={{
+          maxWidth: 620,
+          margin: '80px auto',
+          textAlign: 'center',
+          fontFamily: 'Syne, sans-serif'
+        }}>
+          <h1>Failed to load survey questions</h1>
+          <p>Check the browser console for details, or verify your survey link is correct.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <FormHeader />
@@ -150,6 +181,15 @@ function App() {
         </p>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/*" element={<SurveyApp />} />
+    </Routes>
   );
 }
 

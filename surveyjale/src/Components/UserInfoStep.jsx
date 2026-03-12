@@ -8,15 +8,16 @@ function isValidEmail(email) {
 function UserInfoStep({ onComplete }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [industry, setIndustry] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
 
   const emailInvalid = emailTouched && email && !isValidEmail(email);
-  const canContinue = email.trim() !== '' && isValidEmail(email);
+  const canContinue = name.trim() !== '' && email.trim() !== '' && isValidEmail(email) && industry.trim() !== '';
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!canContinue) return;
-    onComplete(name.trim(), email.trim());
+    onComplete(name.trim(), email.trim(), industry.trim());
   };
 
   return (
@@ -27,7 +28,7 @@ function UserInfoStep({ onComplete }) {
         <form onSubmit={handleSubmit} noValidate>
           <div className="user-info-field">
             <label className="user-info-label" htmlFor="respondent-name">
-              Name <span className="user-info-optional">(optional)</span>
+              Name <span className="user-info-required">*</span>
             </label>
             <input
               id="respondent-name"
@@ -36,6 +37,7 @@ function UserInfoStep({ onComplete }) {
               placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           <div className="user-info-field">
@@ -55,6 +57,20 @@ function UserInfoStep({ onComplete }) {
             {emailInvalid && (
               <p className="user-info-error">Please enter a valid email address.</p>
             )}
+          </div>
+          <div className="user-info-field">
+            <label className="user-info-label" htmlFor="respondent-industry">
+              Industry <span className="user-info-required">*</span>
+            </label>
+            <input
+              id="respondent-industry"
+              className="user-info-input"
+              type="text"
+              placeholder="e.g. Healthcare, Finance, Technology"
+              value={industry}
+              onChange={(e) => setIndustry(e.target.value)}
+              required
+            />
           </div>
           <button
             className="user-info-btn"

@@ -28,14 +28,15 @@ const schema = a.schema({
 
   Submission: a
     .model({
-      respondentName: a.string(),
+      respondentName: a.string().required(),
       respondentEmail: a.string().required(),
+      respondentIndustry: a.string().required(),
       responses: a.json().required(),
       surveyId: a.id().required(),
       survey: a.belongsTo('Survey', 'surveyId'),
     })
     .authorization((allow) => [
-      allow.guest().to(['create', 'read']),
+      allow.guest().to(['create']),
       allow.authenticated().to(['create', 'read']),
     ]),
 

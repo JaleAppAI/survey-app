@@ -11,14 +11,23 @@ export default function VoiceRecorder({
     onVoiceCommand,
     onLiveTranscriptChange,
     onTranscriptCleared,
+    autoStartRecording,
+    onRecordingStarted,
+    onRecordStart,
 }) {
     const handleVoiceCommand = (command, finalTranscriptParam) => {
         if (command === 'NEXT_QUESTION') {
             stopRecording();
             setConfirmed(true);
-            onTranscriptConfirmed?.(finalTranscriptParam !== undefined ? finalTranscriptParam : finalTranscript);
-            resetTranscript();
+            const transcriptToSave = finalTranscriptParam !== undefined ? finalTranscriptParam : finalTranscript;
+            onTranscriptConfirmed?.(transcriptToSave);
             onVoiceCommand?.(command);
+
+            // Allow React cycle to flush the confirmed transcript up to the Question component 
+            // before we blank it out locally
+            setTimeout(() => {
+                resetTranscript();
+            }, 50);
         }
     };
 
@@ -50,6 +59,13 @@ export default function VoiceRecorder({
         resetTranscript();
         onTranscriptCleared?.();
     };
+
+    useEffect(() => {
+        if (autoStartRecording) {
+            startRecording();
+            onRecordingStarted?.();
+        }
+    }, [autoStartRecording, startRecording, onRecordingStarted]);
 
     useEffect(() => {
         onLiveTranscriptChange?.(finalTranscript, partialTranscript);
@@ -103,7 +119,10 @@ export default function VoiceRecorder({
                 ) : (
                     <button
                         className="voice-recorder-btn voice-recorder-btn--record"
-                        onClick={startRecording}
+                        onClick={() => {
+                            onRecordStart?.();
+                            startRecording();
+                        }}
                     >
                         <Mic size={16} />
                         Record

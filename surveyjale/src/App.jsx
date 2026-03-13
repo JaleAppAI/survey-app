@@ -25,6 +25,7 @@ function SurveyApp() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
   const [fetchError, setFetchError] = useState(false);
+  const [recordingIndex, setRecordingIndex] = useState(null);
   const questionRefs = useRef([]);
 
   // Fetch questions from DynamoDB on load
@@ -71,6 +72,7 @@ function SurveyApp() {
     if (command === 'NEXT_QUESTION') {
       if (index + 1 < questions.length) {
         questionRefs.current[index + 1]?.focus();
+        setRecordingIndex(index + 1);
       }
     }
   };
@@ -174,6 +176,8 @@ function SurveyApp() {
               onChange={(value) => handleResponseChange(index, value)}
               hasError={errors[index] || false}
               onVoiceCommand={(command) => handleVoiceCommand(index, command)}
+              autoStartRecording={recordingIndex === index}
+              onRecordingStarted={() => setRecordingIndex(null)}
             />
           </li>
         ))}

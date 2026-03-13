@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import './Question.css';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import VoiceRecorder from './VoiceRecorder';
-import { useTextToSpeech } from '../hooks/useTextToSpeech';
 
 function Question({
     questionNumber = 1,
@@ -13,7 +12,9 @@ function Question({
     onVoiceCommand,
     hasError = false,
     autoStartRecording,
-    onRecordingStarted
+    onRecordingStarted,
+    speak,
+    stopSpeaking
 }) {
     const [liveFinal, setLiveFinal] = useState("");
     const [livePartial, setLivePartial] = useState("");
@@ -22,8 +23,6 @@ function Question({
         const { credentials } = await fetchAuthSession();
         return credentials;
     }, []);
-
-    const { speak } = useTextToSpeech({ getCredentials });
 
     const speakQuestion = () => {
         speak(questionText);
@@ -54,6 +53,7 @@ function Question({
                         readOnly={!!hasLiveAudio}
                         onChange={(e) => onChange(e.target.value)}
                         onFocus={speakQuestion}
+                        onBlur={() => stopSpeaking()}
                     />
                     {hasError && <p className="question-error-msg">This field is required.</p>}
                 </div>
@@ -77,4 +77,4 @@ function Question({
     );
 }
 
-export default Question;
+export default Question;

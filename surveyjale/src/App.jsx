@@ -4,10 +4,12 @@ import FormHeader from './Components/FormHeader';
 import UserInfoStep from './Components/UserInfoStep';
 import SuccessStep from './Components/SuccessStep';
 import { Send } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Routes, Route, useSearchParams } from 'react-router-dom';
 // TODO: Uncomment for amplify to work
 import { generateClient } from 'aws-amplify/data';
+import { fetchAuthSession } from 'aws-amplify/auth';
+import { useTextToSpeech } from './hooks/useTextToSpeech';
 import AdminPage from './pages/AdminPage';
 
 const client = generateClient();
@@ -27,6 +29,13 @@ function SurveyApp() {
   const [fetchError, setFetchError] = useState(false);
   const [recordingIndex, setRecordingIndex] = useState(null);
   const questionRefs = useRef([]);
+
+  const getCredentials = useCallback(async () => {
+    const { credentials } = await fetchAuthSession();
+    return credentials;
+  }, []);
+
+  const { speak, stop } = useTextToSpeech({ getCredentials });
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
@@ -178,6 +187,8 @@ function SurveyApp() {
               onVoiceCommand={(command) => handleVoiceCommand(index, command)}
               autoStartRecording={recordingIndex === index}
               onRecordingStarted={() => setRecordingIndex(null)}
+              speak={speak}
+              stopSpeaking={stop}
             />
           </li>
         ))}

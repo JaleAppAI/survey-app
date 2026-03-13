@@ -15,6 +15,7 @@ export function useTextToSpeech({ region = 'us-east-1', getCredentials, voiceId 
     const audioRef = useRef(null);
     const objectUrlRef = useRef(null);
     const speakTimeoutRef = useRef(null);
+    const speakIdRef = useRef(0);
 
     const cleanup = useCallback(() => {
         if (audioRef.current) {
@@ -29,6 +30,7 @@ export function useTextToSpeech({ region = 'us-east-1', getCredentials, voiceId 
     }, []);
 
     const stop = useCallback(() => {
+        speakIdRef.current += 1; // Invalidate any in-flight requests
         if (speakTimeoutRef.current) {
             clearTimeout(speakTimeoutRef.current);
             speakTimeoutRef.current = null;
@@ -41,10 +43,9 @@ export function useTextToSpeech({ region = 'us-east-1', getCredentials, voiceId 
         if (!text || !getCredentials) return;
 
         // Cancel any ongoing speech and pending speak calls
-        if (speakTimeoutRef.current) {
-            clearTimeout(speakTimeoutRef.current);
-        }
-        cleanup();
+        stop();
+
+        const currentSpeakId = ++speakIdRef.current;
 
         // Small delay so blur events don't immediately cancel us
         speakTimeoutRef.current = setTimeout(async () => {
@@ -52,6 +53,10 @@ export function useTextToSpeech({ region = 'us-east-1', getCredentials, voiceId 
                 setIsSpeaking(true);
 
                 const credentials = await getCredentials();
+
+                // Check if this speak was cancelled while awaiting credentials
+                if (speakIdRef.current !== currentSpeakId) return;
+
                 const client = new PollyClient({
                     region,
                     credentials: {
@@ -70,6 +75,9 @@ export function useTextToSpeech({ region = 'us-east-1', getCredentials, voiceId 
                 });
 
                 const response = await client.send(command);
+
+                // Check if this speak was cancelled while awaiting Polly
+                if (speakIdRef.current !== currentSpeakId) return;
 
                 // Convert the audio stream to a Blob and play it
                 const blob = new Blob(
@@ -99,7 +107,7 @@ export function useTextToSpeech({ region = 'us-east-1', getCredentials, voiceId 
             }
             speakTimeoutRef.current = null;
         }, 80);
-    }, [region, getCredentials, voiceId, cleanup]);
+    }, [region, getCredentials, voiceId, cleanup, stop]);
 
     // Cleanup on unmount
     useEffect(() => {

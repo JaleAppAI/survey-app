@@ -1,0 +1,141 @@
+/* ── VoiceRecorder ────────────────────────────────────── */
+
+.voice-recorder {
+    margin-top: 12px;
+}
+
+/* Error message */
+.voice-recorder-error {
+    color: #f44336;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+/* Recording indicator */
+.voice-recorder-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #f44336;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.voice-recorder-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f44336;
+    animation: voice-recorder-pulse 1s ease-in-out infinite;
+}
+
+@keyframes voice-recorder-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+}
+
+/* Transcript box */
+.voice-recorder-transcript-box {
+    min-height: 60px;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid #dde3ed;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #1a1a2e;
+}
+
+.voice-recorder-final {
+    color: #1a1a2e;
+}
+
+.voice-recorder-partial {
+    color: #888;
+    font-style: italic;
+}
+
+.voice-recorder-placeholder {
+    color: #9ba8b8;
+    font-style: italic;
+}
+
+/* Controls */
+.voice-recorder-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.voice-recorder-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    color: #fff;
+}
+
+.voice-recorder-btn--record {
+    background: #2563eb;
+}
+
+.voice-recorder-btn--record:hover {
+    background: #1d4ed8;
+}
+
+.voice-recorder-btn--stop {
+    background: #f44336;
+}
+
+.voice-recorder-btn--stop:hover {
+    background: #d32f2f;
+}
+
+.voice-recorder-btn--confirm {
+    background: #4CAF50;
+}
+
+.voice-recorder-btn--confirm:hover {
+    background: #388E3C;
+}
+
+.voice-recorder-btn--rerecord {
+    background: #6b7280;
+}
+
+.voice-recorder-btn--rerecord:hover {
+    background: #4b5563;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media only screen and (max-width: 600px) {
+    .voice-recorder-transcript-box {
+        min-height: 48px;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .voice-recorder-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}

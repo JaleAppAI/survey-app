@@ -4,7 +4,7 @@ import FormHeader from './Components/FormHeader';
 import UserInfoStep from './Components/UserInfoStep';
 import SuccessStep from './Components/SuccessStep';
 import { Send } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useSearchParams } from 'react-router-dom';
 // TODO: Uncomment for amplify to work
 import { generateClient } from 'aws-amplify/data';
@@ -25,6 +25,7 @@ function SurveyApp() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
   const [fetchError, setFetchError] = useState(false);
+  const questionRefs = useRef([]);
 
   // Fetch questions from DynamoDB on load
   useEffect(() => {
@@ -63,6 +64,14 @@ function SurveyApp() {
       const newErrors = [...errors];
       newErrors[index] = false;
       setErrors(newErrors);
+    }
+  };
+
+  const handleVoiceCommand = (index, command) => {
+    if (command === 'NEXT_QUESTION') {
+      if (index + 1 < questions.length) {
+        questionRefs.current[index + 1]?.focus();
+      }
     }
   };
 
@@ -158,11 +167,13 @@ function SurveyApp() {
         {questions.map((q, index) => (
           <li key={q.id}>
             <Question
+              inputRef={(el) => (questionRefs.current[index] = el)}
               questionNumber={index + 1}
               questionText={q.text}
               value={responses[index]}
               onChange={(value) => handleResponseChange(index, value)}
               hasError={errors[index] || false}
+              onVoiceCommand={(command) => handleVoiceCommand(index, command)}
             />
           </li>
         ))}

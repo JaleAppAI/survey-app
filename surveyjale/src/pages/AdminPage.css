@@ -1,0 +1,51 @@
+/* Layout containers */
+.admin-header {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Table column visibility */
+.admin-table .col-email,
+.admin-table .col-industry {
+  display: table-cell;
+}
+
+/* Export button */
+.export-btn-mobile {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .admin-content {
+    padding: 16px 12px;
+  }
+
+  .admin-card {
+    padding: 16px;
+  }
+
+  .admin-table {
+    font-size: 13px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 8px 6px;
+  }
+
+  .admin-table .col-email,
+  .admin-table .col-industry {
+    display: none;
+  }
+
+  .export-btn-mobile {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-view-btn {
+    min-height: 36px;
+    min-width: 56px;
+  }
+}

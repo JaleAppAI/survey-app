@@ -1,71 +1,86 @@
-# Workflow & Task Management
+# Workflow & Operating Rules
 
-Rules for how Claude Code operates on this project.
+Rules for how Claude Code operates on this project. Skills must be invoked via the `Skill` tool — reading this file does not substitute for invoking them.
 
 ---
 
 ## Core Principles
 
-- **Simplicity First** — Make every change as simple as possible. Touch minimal code.
+- **Simplicity First** — Touch minimal code. Make every change as small as possible.
 - **No Laziness** — Find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact** — Changes should only touch what's necessary. Avoid introducing bugs.
+- **Minimal Impact** — Only touch what's necessary. Avoid cascading changes.
 
 ---
 
-## Workflow Orchestration
+## Skill Invocation Map
 
-### 1. Plan Mode Default
-- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions).
-- If something goes sideways, STOP and re-plan immediately — don't keep pushing.
-- Use plan mode for verification steps, not just building.
-- Write detailed specs upfront to reduce ambiguity.
+This project uses skills from the `superpowers` and `everything-claude-code` packs. Invoke the correct skill **before** acting — not after.
 
-### 2. Subagent Strategy
-- Use subagents liberally to keep the main context window clean.
-- Offload research, exploration, and parallel analysis to subagents.
-- For complex problems, throw more compute at it via subagents.
-- One task per subagent for focused execution.
+### Planning & Design
 
-### 3. Self-Improvement Loop
-- After ANY correction from the user: update `ai/lessons.md` with the pattern.
-- Write rules for yourself that prevent the same mistake.
-- Ruthlessly iterate on these lessons until mistake rate drops.
-- Review lessons at session start for the relevant project.
+| Trigger | Skill to invoke |
+|---|---|
+| Any new feature, UI change, or multi-step task | `superpowers:brainstorming` first, then `superpowers:writing-plans` |
+| Turning a spec or requirement into a step-by-step plan | `superpowers:writing-plans` |
+| UI/UX decisions — layout, visual design, components, responsiveness | `ui-ux-pro-max:ui-ux-pro-max` |
+| Frontend architecture, React patterns, state management | `everything-claude-code:frontend-patterns` |
 
-### 4. Verification Before Done
-- Never mark a task complete without proving it works.
-- Diff behavior between main and your changes when relevant.
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, demonstrate correctness.
+### Implementation
 
-### 5. Demand Elegance (Balanced)
-- For non-trivial changes: pause and ask "is there a more elegant way?"
-- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution."
-- Skip this for simple, obvious fixes — don't over-engineer.
-- Challenge your own work before presenting it.
+| Trigger | Skill to invoke |
+|---|---|
+| Executing a written plan | `superpowers:executing-plans` |
+| Implementing any feature or bugfix | `superpowers:test-driven-development` |
+| Adding auth, handling user input, API endpoints, or sensitive data | `everything-claude-code:security-review` |
 
-### 6. Autonomous Bug Fixing
-- When given a bug report: just fix it. Don't ask for hand-holding.
-- Point at logs, errors, failing tests — then resolve them.
-- Zero context switching required from the user.
-- Go fix failing CI tests without being told how.
+### Debugging
+
+| Trigger | Skill to invoke |
+|---|---|
+| Any bug, test failure, or unexpected behavior | `superpowers:systematic-debugging` |
+
+### Completion & Review
+
+| Trigger | Skill to invoke |
+|---|---|
+| About to say "done", "complete", or "fixed" | `superpowers:verification-before-completion` |
+| Major feature or step complete | `superpowers:requesting-code-review` |
 
 ---
 
-## Task Management
+## Workflow Stages
 
-All task tracking lives in the `ai/` directory at the project root.
+### 1. Before Starting Any Task
+- Invoke `superpowers:brainstorming` for features, UI work, or anything with design decisions.
+- Invoke `superpowers:writing-plans` for anything 3+ steps or with architectural impact.
+- For UI-heavy work, invoke `ui-ux-pro-max:ui-ux-pro-max` before touching JSX or CSS.
+
+### 2. During Implementation
+- Invoke `superpowers:executing-plans` when working off a written plan.
+- Invoke `everything-claude-code:security-review` proactively on any auth or input code — don't wait to be asked.
+- Invoke `everything-claude-code:frontend-patterns` when making structural React decisions.
+
+### 3. Before Claiming Done
+- Always invoke `superpowers:verification-before-completion` before saying a task is complete.
+- Run `npm run build` from `surveyjale/` to confirm no build errors.
+- Ask: "Would a staff engineer approve this?"
+
+### 4. After Any User Correction
+- Update `ai/lessons.md` with the pattern immediately.
+- Write a rule that prevents the same mistake.
+
+---
+
+## Task Tracking
 
 | File | Purpose |
 |---|---|
 | `ai/todo.md` | Current plan with checkable items |
-| `ai/lessons.md` | Patterns learned from mistakes — reviewed at session start |
+| `ai/lessons.md` | Patterns learned from corrections — review at session start |
 
 ### Task Lifecycle
-
-1. **Plan** — Write plan to `ai/todo.md` with checkable items.
-2. **Check in** — Verify the plan before starting implementation.
+1. **Plan** — Write plan to `ai/todo.md`. Invoke planning skills first.
+2. **Check in** — Confirm plan before touching code.
 3. **Track** — Mark items complete as you go.
-4. **Explain** — High-level summary at each step.
-5. **Document** — Add a review section to `ai/todo.md` when finished.
-6. **Learn** — Update `ai/lessons.md` after any correction.
+4. **Verify** — Invoke `superpowers:verification-before-completion` before marking done.
+5. **Learn** — Update `ai/lessons.md` after any correction.

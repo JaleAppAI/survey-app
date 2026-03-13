@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/data';
 import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth';
+import './AdminPage.css';
 
 const client = generateClient({ authMode: 'userPool' });
 
@@ -142,7 +144,7 @@ const styles = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%,-50%)',
-    width: '520px',
+    width: '600px',
     maxWidth: 'calc(100vw - 32px)',
     zIndex: 1001,
     background: '#fff',
@@ -150,30 +152,52 @@ const styles = {
     boxShadow: '0 8px 48px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)',
     fontFamily: 'Syne, sans-serif',
     animation: 'fadeScale 200ms ease-out',
+    display: 'flex',
+    flexDirection: 'column',
+    maxHeight: 'calc(100vh - 48px)',
   },
   modalHeader: {
-    padding: '20px 24px 16px',
+    padding: '20px 24px',
     borderBottom: '1px solid #e8edf5',
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
+    gap: '16px',
+    flexShrink: 0,
   },
   modalName: {
-    margin: 0,
+    margin: '0 0 14px',
     fontSize: '17px',
     fontWeight: 700,
     color: '#1a1a2e',
   },
-  modalMeta: {
-    margin: 0,
+  modalInfoGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '12px',
+  },
+  modalInfoItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '3px',
+  },
+  modalInfoLabel: {
+    fontSize: '10px',
+    fontWeight: 700,
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+    letterSpacing: '0.07em',
+  },
+  modalInfoValue: {
     fontSize: '13px',
-    color: '#64748b',
-    marginTop: '4px',
+    color: '#1e293b',
+    fontWeight: 500,
+    wordBreak: 'break-all',
   },
   modalBody: {
-    padding: '16px 24px',
-    maxHeight: '380px',
+    padding: '20px 24px',
     overflowY: 'auto',
+    flex: 1,
   },
   modalClose: {
     background: 'none',
@@ -189,24 +213,51 @@ const styles = {
     justifyContent: 'center',
     flexShrink: 0,
   },
+  modalFooter: {
+    padding: '12px 24px',
+    borderTop: '1px solid #e8edf5',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    flexShrink: 0,
+  },
   qaBlock: {
-    marginBottom: '12px',
-    paddingBottom: '12px',
+    marginBottom: '16px',
   },
-  qText: {
+  qaRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '10px',
+    marginBottom: '8px',
+  },
+  qaNumber: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    background: '#2563eb',
+    color: '#fff',
+    fontSize: '11px',
     fontWeight: 700,
-    color: '#1a1a2e',
-    marginBottom: '4px',
-    fontSize: '13px',
-    borderLeft: '3px solid #2563eb',
-    paddingLeft: '8px',
+    flexShrink: 0,
+    marginTop: '1px',
   },
-  aText: {
-    color: '#374151',
+  qaQuestionText: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#1a1a2e',
+    lineHeight: 1.5,
+  },
+  qaAnswer: {
+    background: '#f8fafc',
+    border: '1px solid #e8edf5',
+    borderRadius: '8px',
+    padding: '10px 14px',
     fontSize: '14px',
+    color: '#374151',
     lineHeight: 1.6,
-    paddingLeft: '11px',
-    marginTop: '6px',
+    marginLeft: '32px',
   },
   tableHeaderRow: {
     display: 'flex',
@@ -225,6 +276,57 @@ const styles = {
     padding: '48px',
     color: '#94a3b8',
     fontSize: '14px',
+  },
+  shareSection: {
+    marginTop: '16px',
+    paddingTop: '16px',
+    borderTop: '1px solid #f1f4f9',
+  },
+  shareSectionLabel: {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    marginBottom: '10px',
+  },
+  shareRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '8px',
+  },
+  shareInput: {
+    flex: 1,
+    padding: '8px 10px',
+    border: '1px solid #dde3ed',
+    borderRadius: '6px',
+    fontFamily: 'Syne, sans-serif',
+    fontSize: '13px',
+    color: '#64748b',
+    background: '#f8fafc',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    minWidth: 0,
+  },
+  copyBtn: {
+    flexShrink: 0,
+    padding: '8px 14px',
+    border: '1px solid #dde3ed',
+    borderRadius: '6px',
+    fontFamily: 'Syne, sans-serif',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    background: '#fff',
+    color: '#374151',
+    whiteSpace: 'nowrap',
+  },
+  copyBtnSuccess: {
+    background: '#f0fdf4',
+    color: '#16a34a',
+    border: '1px solid #bbf7d0',
   },
 };
 
@@ -301,15 +403,28 @@ function SubmissionModal({ submission, onClose }) {
     return new Date(iso).toLocaleString();
   };
 
-  return (
+  return createPortal(
     <>
       <style>{`@keyframes fadeScale { from { opacity: 0; transform: translate(-50%,-50%) scale(0.96); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }`}</style>
       <div style={styles.modalBackdrop} onClick={onClose} />
       <div style={styles.modalCard}>
         <div style={styles.modalHeader}>
-          <div>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <p style={styles.modalName}>{submission.respondentName || '—'}</p>
-            <p style={styles.modalMeta}>{submission.respondentEmail} · {submission.respondentIndustry || '—'} · {formatDate(submission.createdAt)}</p>
+            <div style={styles.modalInfoGrid}>
+              <div style={styles.modalInfoItem}>
+                <span style={styles.modalInfoLabel}>Email</span>
+                <span style={styles.modalInfoValue}>{submission.respondentEmail || '—'}</span>
+              </div>
+              <div style={styles.modalInfoItem}>
+                <span style={styles.modalInfoLabel}>Industry</span>
+                <span style={styles.modalInfoValue}>{submission.respondentIndustry || '—'}</span>
+              </div>
+              <div style={styles.modalInfoItem}>
+                <span style={styles.modalInfoLabel}>Submitted</span>
+                <span style={styles.modalInfoValue}>{formatDate(submission.createdAt)}</span>
+              </div>
+            </div>
           </div>
           <button style={styles.modalClose} onClick={onClose}>×</button>
         </div>
@@ -317,19 +432,23 @@ function SubmissionModal({ submission, onClose }) {
           {responses.length === 0 ? (
             <p style={{ color: '#94a3b8', margin: 0, fontSize: '13px' }}>No responses found.</p>
           ) : (
-            responses.map((r, i) => {
-              const isLast = i === responses.length - 1;
-              return (
-                <div key={i} style={{ ...styles.qaBlock, borderBottom: isLast ? 'none' : '1px solid #e8edf5' }}>
-                  <div style={styles.qText}>Q{i + 1}: {r.questionText}</div>
-                  <div style={styles.aText}>{r.responseText}</div>
+            responses.map((r, i) => (
+              <div key={i} style={styles.qaBlock}>
+                <div style={styles.qaRow}>
+                  <span style={styles.qaNumber}>{i + 1}</span>
+                  <span style={styles.qaQuestionText}>{r.questionText}</span>
                 </div>
-              );
-            })
+                <div style={styles.qaAnswer}>{r.responseText || <em style={{ color: '#94a3b8' }}>No answer</em>}</div>
+              </div>
+            ))
           )}
         </div>
+        <div style={styles.modalFooter}>
+          <button style={{ ...styles.expandBtn, padding: '7px 20px' }} onClick={onClose}>Close</button>
+        </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 
@@ -346,11 +465,11 @@ function SubmissionRow({ submission }) {
     <>
       <tr>
         <td style={styles.td}>{submission.respondentName || '—'}</td>
-        <td style={styles.td}>{submission.respondentEmail}</td>
-        <td style={styles.td}>{submission.respondentIndustry || '—'}</td>
+        <td style={styles.td} className="col-email">{submission.respondentEmail}</td>
+        <td style={styles.td} className="col-industry">{submission.respondentIndustry || '—'}</td>
         <td style={styles.td}>{formatDate(submission.createdAt)}</td>
         <td style={styles.td}>
-          <button style={styles.expandBtn} onClick={() => setShowModal(true)}>
+          <button style={styles.expandBtn} className="admin-view-btn" onClick={() => setShowModal(true)}>
             ▶ View
           </button>
         </td>
@@ -419,6 +538,7 @@ export default function AdminPage() {
   const [selectedSurveyId, setSelectedSurveyId] = useState(searchParams.get('survey') || '');
   const [submissions, setSubmissions] = useState([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Check auth on mount
   useEffect(() => {
@@ -475,6 +595,15 @@ export default function AdminPage() {
     fetchSubmissions();
   }, [selectedSurveyId]);
 
+  const respondentUrl = selectedSurveyId ? `${window.location.origin}/?survey=${selectedSurveyId}` : '';
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    });
+  };
+
   const handleSignOut = async () => {
     await signOut();
     setIsAuthenticated(false);
@@ -497,38 +626,52 @@ export default function AdminPage() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.content}>
-        <div style={styles.contentHeader}>
+    <div style={styles.page} className="admin-page">
+      <div style={styles.content} className="admin-content">
+        <div style={styles.contentHeader} className="admin-header">
           <h1 style={styles.contentTitle}>Admin Dashboard</h1>
           <button style={styles.signOutBtn} onClick={handleSignOut}>Sign out</button>
         </div>
 
         {/* Survey selector */}
-        <div style={styles.card}>
+        <div style={styles.card} className="admin-card">
           <label style={styles.label}>Select Survey</label>
           <select
             style={styles.select}
             value={selectedSurveyId}
-            onChange={e => setSelectedSurveyId(e.target.value)}
+            onChange={e => { setSelectedSurveyId(e.target.value); setCopiedLink(false); }}
           >
             <option value="">— Choose a survey —</option>
             {surveys.map(s => (
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>
+          {selectedSurveyId && (
+            <div style={styles.shareSection}>
+              <div style={styles.shareSectionLabel}>Share Links</div>
+              <div style={styles.shareRow}>
+                <div style={styles.shareInput}>{respondentUrl}</div>
+                <button
+                  style={copiedLink ? { ...styles.copyBtn, ...styles.copyBtnSuccess } : styles.copyBtn}
+                  onClick={() => handleCopy(respondentUrl)}
+                >
+                  {copiedLink ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+            </div>
+          )}
           {surveyError && <p style={styles.errorText}>{surveyError}</p>}
         </div>
 
         {/* Submissions table */}
         {selectedSurveyId && (
-          <div style={styles.card}>
+          <div style={styles.card} className="admin-card">
             <div style={styles.tableHeaderRow}>
               <h2 style={styles.tableTitle}>
                 Submissions {!loadingSubmissions && `(${submissions.length})`}
               </h2>
               {submissions.length > 0 && (
-                <button style={styles.exportBtn} onClick={() => exportCSV(submissions)}>
+                <button style={styles.exportBtn} className="export-btn-mobile" onClick={() => exportCSV(submissions)}>
                   Export CSV
                 </button>
               )}
@@ -539,12 +682,12 @@ export default function AdminPage() {
             ) : submissions.length === 0 ? (
               <div style={styles.emptyState}>No submissions yet for this survey.</div>
             ) : (
-              <table style={styles.table}>
+              <table style={styles.table} className="admin-table">
                 <thead>
                   <tr>
                     <th style={styles.th}>Name</th>
-                    <th style={styles.th}>Email</th>
-                    <th style={styles.th}>Industry</th>
+                    <th style={styles.th} className="col-email">Email</th>
+                    <th style={styles.th} className="col-industry">Industry</th>
                     <th style={styles.th}>Submitted At</th>
                     <th style={styles.th}></th>
                   </tr>

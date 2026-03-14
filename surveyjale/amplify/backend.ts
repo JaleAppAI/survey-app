@@ -8,7 +8,7 @@ const backend = defineBackend({
   data,
 });
 
-// Grant Cognito unauthenticated role permission to stream to Transcribe
+// Grant Cognito unauthenticated role permission to stream to Transcribe & use Polly
 const unauthRole = backend.auth.resources.unauthenticatedUserIamRole;
 unauthRole.addToPrincipalPolicy(
   new PolicyStatement({
@@ -16,6 +16,7 @@ unauthRole.addToPrincipalPolicy(
     actions: [
       'transcribe:StartStreamTranscription',
       'transcribe:StartStreamTranscriptionWebSocket',
+      'polly:SynthesizeSpeech',
     ],
     resources: ['*'],
   })

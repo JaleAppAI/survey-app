@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import './Question.css';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import VoiceRecorder from './VoiceRecorder';
@@ -10,10 +10,23 @@ function Question({
     onChange,
     inputRef,
     onVoiceCommand,
-    hasError = false
+    hasError = false,
+    autoStartRecording,
+    onRecordingStarted,
+    speak,
+    stopSpeaking
 }) {
     const [liveFinal, setLiveFinal] = useState("");
     const [livePartial, setLivePartial] = useState("");
+
+    const getCredentials = useCallback(async () => {
+        const { credentials } = await fetchAuthSession();
+        return credentials;
+    }, []);
+
+    const speakQuestion = () => {
+        speak(questionText);
+    };
 
     const handleTranscriptConfirmed = (text) => {
         onChange(value ? `${value} ${text}` : text);
@@ -39,6 +52,8 @@ function Question({
                         value={displayValue}
                         readOnly={!!hasLiveAudio}
                         onChange={(e) => onChange(e.target.value)}
+                        onFocus={speakQuestion}
+                        onBlur={() => stopSpeaking()}
                     />
                     {hasError && <p className="question-error-msg">This field is required.</p>}
                 </div>
@@ -46,10 +61,7 @@ function Question({
             <VoiceRecorder
                 region="us-east-2"
                 languageOptions="en-US,es-US"
-                getCredentials={async () => {
-                    const { credentials } = await fetchAuthSession();
-                    return credentials;
-                }}
+                getCredentials={getCredentials}
                 onTranscriptConfirmed={handleTranscriptConfirmed}
                 onVoiceCommand={onVoiceCommand}
                 onLiveTranscriptChange={(final, partial) => {
@@ -57,6 +69,9 @@ function Question({
                     setLivePartial(partial);
                 }}
                 onTranscriptCleared={() => onChange('')}
+                autoStartRecording={autoStartRecording}
+                onRecordingStarted={onRecordingStarted}
+                onRecordStart={speakQuestion}
             />
         </div>
     );

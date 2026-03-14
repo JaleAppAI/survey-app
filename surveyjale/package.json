@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-polly": "^3.1009.0",
     "@aws-sdk/client-transcribe-streaming": "^3.1006.0",
     "aws-amplify": "^6.16.2",
     "lucide-react": "^0.576.0",

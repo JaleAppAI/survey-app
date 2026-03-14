@@ -34,12 +34,26 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
     const [partialTranscript, setPartialTranscript] = useState('');
     const partialTranscriptRef = useRef('');
     const [finalTranscript, setFinalTranscript] = useState('');
+    const finalTranscriptRef = useRef('');
     const [isRecording, setIsRecording] = useState(false);
     const [error, setError] = useState(null);
 
     const updatePartial = useCallback((val) => {
         setPartialTranscript(val);
         partialTranscriptRef.current = val;
+    }, []);
+
+    const updateFinal = useCallback((val) => {
+        setFinalTranscript(val);
+        finalTranscriptRef.current = val;
+    }, []);
+
+    const appendFinal = useCallback((text) => {
+        setFinalTranscript((prev) => {
+            const next = prev ? prev + ' ' + text : text;
+            finalTranscriptRef.current = next;
+            return next;
+        });
     }, []);
 
     const audioContextRef = useRef(null);
@@ -169,34 +183,23 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
                 for (const result of results) {
                     const transcript = result.Alternatives?.[0]?.Transcript || '';
                     if (result.IsPartial) {
-                        const lowerTranscript = transcript.toLowerCase();
-                        if (lowerTranscript.includes('next question')) {
-                            const withoutCommand = transcript.substring(0, lowerTranscript.indexOf('next question'));
-                            let updatedFinal = finalTranscript;
-                            if (withoutCommand.trim()) {
-                                updatedFinal = (finalTranscript ? finalTranscript + ' ' : '') + withoutCommand.trim();
-                                setFinalTranscript(updatedFinal);
-                            }
-                            updatePartial('');
-                            onVoiceCommand?.('NEXT_QUESTION', updatedFinal);
-                            break;
-                        }
                         updatePartial(transcript);
                     } else {
                         const lowerTranscript = transcript.toLowerCase();
                         if (lowerTranscript.includes('next question')) {
-                            const withoutCommand = transcript.substring(0, lowerTranscript.indexOf('next question'));
-                            let updatedFinal = finalTranscript;
+                            const withoutCommand = transcript.substring(0, lowerTranscript.indexOf('next question') || lowerTranscript.indexOf('next'));
+                            let updatedFinal = finalTranscriptRef.current;
                             if (withoutCommand.trim()) {
-                                updatedFinal = (finalTranscript ? finalTranscript + ' ' : '') + withoutCommand.trim();
-                                setFinalTranscript(updatedFinal);
+                                updatedFinal = (updatedFinal ? updatedFinal + ' ' : '') + withoutCommand.trim();
+                                updateFinal(updatedFinal);
+                            } else {
                             }
                             updatePartial('');
                             onVoiceCommand?.('NEXT_QUESTION', updatedFinal);
                             break;
                         }
 
-                        setFinalTranscript((prev) => (prev ? prev + ' ' : '') + transcript);
+                        appendFinal(transcript);
                         updatePartial('');
                     }
                 }
@@ -259,9 +262,9 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
 
     const resetTranscript = useCallback(() => {
         updatePartial('');
-        setFinalTranscript('');
+        updateFinal('');
         setError(null);
-    }, [updatePartial]);
+    }, [updatePartial, updateFinal]);
 
     // Cleanup on unmount
     useEffect(() => {

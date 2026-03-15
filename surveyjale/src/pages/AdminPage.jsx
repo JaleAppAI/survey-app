@@ -328,7 +328,107 @@ const styles = {
     color: '#16a34a',
     border: '1px solid #bbf7d0',
   },
+  createBtn: {
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '7px 16px',
+    cursor: 'pointer',
+    fontFamily: 'Syne, sans-serif',
+    fontSize: '14px',
+    fontWeight: 600,
+    marginRight: '8px',
+  },
+  fileInput: {
+    display: 'block',
+    width: '100%',
+    padding: '8px 0',
+    fontFamily: 'Syne, sans-serif',
+    fontSize: '14px',
+    color: '#374151',
+  },
+  csvErrorList: {
+    margin: '8px 0 0',
+    padding: '10px 14px',
+    background: '#fef2f2',
+    border: '1px solid #fecaca',
+    borderRadius: '6px',
+    listStyle: 'none',
+    fontSize: '13px',
+    color: '#dc2626',
+  },
+  csvSuccess: {
+    margin: '8px 0 0',
+    padding: '8px 12px',
+    background: '#f0fdf4',
+    border: '1px solid #bbf7d0',
+    borderRadius: '6px',
+    fontSize: '13px',
+    color: '#16a34a',
+    fontWeight: 600,
+  },
+  successState: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '32px 24px',
+    gap: '12px',
+  },
+  successIcon: {
+    width: '56px',
+    height: '56px',
+    borderRadius: '50%',
+    background: '#f0fdf4',
+    border: '2px solid #bbf7d0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '28px',
+  },
+  spinnerWrap: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '48px 24px',
+    gap: '16px',
+    color: '#64748b',
+    fontSize: '14px',
+  },
 };
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const questions = [];
+  const errors = [];
+  const seenOrders = new Set();
+
+  // Skip header row if first cell is non-numeric
+  const startIdx = isNaN(Number(lines[0]?.split(',')[0])) ? 1 : 0;
+
+  lines.slice(startIdx).forEach((line, i) => {
+    const rowNum = startIdx + i + 1;
+    const commaIdx = line.indexOf(',');
+    if (commaIdx === -1) { errors.push(`Row ${rowNum}: missing comma separator`); return; }
+    const rawOrder = line.slice(0, commaIdx).trim();
+    const text     = line.slice(commaIdx + 1).trim();
+    const order    = Number(rawOrder);
+
+    if (!Number.isInteger(order) || order < 1) {
+      errors.push(`Row ${rowNum}: order must be a positive integer (got "${rawOrder}")`);
+    } else if (seenOrders.has(order)) {
+      errors.push(`Row ${rowNum}: duplicate order value ${order}`);
+    } else {
+      seenOrders.add(order);
+    }
+    if (!text) errors.push(`Row ${rowNum}: question text is empty`);
+    if (!errors.find(e => e.startsWith(`Row ${rowNum}`))) {
+      questions.push({ order, text });
+    }
+  });
+
+  return { questions, errors };
+}
 
 // Login form shown when not authenticated
 function LoginForm({ onSuccess }) {
@@ -452,6 +552,164 @@ function SubmissionModal({ submission, onClose }) {
   );
 }
 
+// Modal for creating a new survey via CSV upload
+function CreateSurveyModal({ onClose, onCreate }) {
+  const [name, setName] = useState('');
+  const [csvQuestions, setCsvQuestions] = useState([]);
+  const [csvErrors, setCsvErrors] = useState([]);
+  const [creating, setCreating] = useState(false);
+  const [createdLink, setCreatedLink] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [createdName, setCreatedName] = useState('');
+
+  function handleCSVFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const { questions, errors } = parseCSV(ev.target.result);
+      setCsvQuestions(questions);
+      setCsvErrors(errors);
+    };
+    reader.readAsText(file);
+  }
+
+  async function handleCreate() {
+    setCreating(true);
+    try {
+      const { data: survey, errors: surveyErrors } = await client.models.Survey.create({ name: name.trim() });
+      if (surveyErrors || !survey) throw new Error(surveyErrors?.[0]?.message || 'Failed to create survey');
+      const sorted = [...csvQuestions].sort((a, b) => a.order - b.order);
+      for (const q of sorted) {
+        const { errors: qErrors } = await client.models.Question.create({ text: q.text, order: q.order, surveyId: survey.id });
+        if (qErrors) throw new Error(qErrors[0]?.message || `Failed to create question: ${q.text}`);
+      }
+      const link = `${window.location.origin}/?survey=${survey.id}`;
+      setCreatedName(name.trim());
+      setCreatedLink(link);
+      onCreate(survey);
+    } catch (err) {
+      console.error('Failed to create survey', err);
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  function handleCopy() {
+    navigator.clipboard.writeText(createdLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const canCreate = name.trim() && csvQuestions.length > 0 && csvErrors.length === 0;
+
+  return createPortal(
+    <>
+      <style>{`@keyframes fadeScale { from { opacity: 0; transform: translate(-50%,-50%) scale(0.96); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }`}</style>
+      <div style={styles.modalBackdrop} onClick={creating ? undefined : onClose} />
+      <div style={styles.modalCard}>
+        <div style={styles.modalHeader}>
+          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#1a1a2e' }}>
+            {createdLink ? 'Survey Created' : 'Create Survey'}
+          </h2>
+          {!creating && (
+            <button style={styles.modalClose} onClick={onClose}>×</button>
+          )}
+        </div>
+
+        {creating ? (
+          <div style={styles.spinnerWrap}>
+            <div style={{
+              width: '32px', height: '32px', border: '3px solid #e2e8f0',
+              borderTop: '3px solid #2563eb', borderRadius: '50%',
+              animation: 'spin 0.7s linear infinite',
+            }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            Creating survey…
+          </div>
+        ) : createdLink ? (
+          <div style={styles.successState}>
+            <div style={styles.successIcon}>✓</div>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: '#1a1a2e' }}>{createdName}</p>
+            <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+              Survey created with {csvQuestions.length} question{csvQuestions.length !== 1 ? 's' : ''}.
+            </p>
+            <div style={{ width: '100%', marginTop: '8px' }}>
+              <div style={{ ...styles.shareSectionLabel, marginBottom: '8px' }}>Share Link</div>
+              <div style={styles.shareRow}>
+                <div style={styles.shareInput}>{createdLink}</div>
+                <button
+                  style={copied ? { ...styles.copyBtn, ...styles.copyBtnSuccess } : styles.copyBtn}
+                  onClick={handleCopy}
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={styles.modalBody}>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={styles.label}>Survey Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                style={styles.input}
+                placeholder="e.g. Customer Feedback Q1 2026"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label style={styles.label}>Questions CSV</label>
+              <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#94a3b8' }}>
+                Two columns: <code>order</code> (positive integer), <code>question_text</code>. Header row optional.
+              </p>
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                onChange={handleCSVFile}
+                style={styles.fileInput}
+              />
+              {csvErrors.length > 0 && (
+                <ul style={styles.csvErrorList}>
+                  {csvErrors.map((e, i) => <li key={i}>{e}</li>)}
+                </ul>
+              )}
+              {csvErrors.length === 0 && csvQuestions.length > 0 && (
+                <div style={styles.csvSuccess}>
+                  ✓ {csvQuestions.length} question{csvQuestions.length !== 1 ? 's' : ''} ready
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div style={styles.modalFooter}>
+          {createdLink ? (
+            <button style={{ ...styles.expandBtn, padding: '7px 20px' }} onClick={onClose}>Close</button>
+          ) : (
+            <>
+              <button style={{ ...styles.expandBtn, padding: '7px 20px', marginRight: '8px' }} onClick={onClose} disabled={creating}>
+                Cancel
+              </button>
+              <button
+                style={{ ...styles.primaryBtn, opacity: canCreate ? 1 : 0.5, cursor: canCreate ? 'pointer' : 'not-allowed' }}
+                onClick={handleCreate}
+                disabled={!canCreate || creating}
+              >
+                Create
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </>,
+    document.body
+  );
+}
+
 // Submission row with modal trigger
 function SubmissionRow({ submission }) {
   const [showModal, setShowModal] = useState(false);
@@ -539,6 +797,7 @@ export default function AdminPage() {
   const [submissions, setSubmissions] = useState([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Check auth on mount
   useEffect(() => {
@@ -610,6 +869,12 @@ export default function AdminPage() {
     setShowLogin(true);
   };
 
+  function handleSurveyCreated(survey) {
+    setSurveys(prev => [...prev, survey]);
+    setSelectedSurveyId(survey.id);
+    setCopiedLink(false);
+  }
+
   if (!isAuthenticated && showLogin) {
     return (
       <LoginForm
@@ -630,7 +895,12 @@ export default function AdminPage() {
       <div style={styles.content} className="admin-content">
         <div style={styles.contentHeader} className="admin-header">
           <h1 style={styles.contentTitle}>Admin Dashboard</h1>
-          <button style={styles.signOutBtn} onClick={handleSignOut}>Sign out</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button style={styles.createBtn} onClick={() => setShowCreateModal(true)}>
+              + Create Survey
+            </button>
+            <button style={styles.signOutBtn} onClick={handleSignOut}>Sign out</button>
+          </div>
         </div>
 
         {/* Survey selector */}
@@ -702,6 +972,13 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {showCreateModal && (
+        <CreateSurveyModal
+          onClose={() => setShowCreateModal(false)}
+          onCreate={handleSurveyCreated}
+        />
+      )}
     </div>
   );
 }

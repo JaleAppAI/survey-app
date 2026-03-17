@@ -637,7 +637,7 @@ function CreateSurveyModal({ onClose, onCreate }) {
           setCreatingStatus(`Generating audio… (${i + 1}/${createdQuestions.length})`);
           try {
             const response = await polly.send(new SynthesizeSpeechCommand({
-              Engine: 'neural',
+              Engine: 'generative',
               OutputFormat: 'mp3',
               Text: q.text,
               VoiceId: 'Ruth',

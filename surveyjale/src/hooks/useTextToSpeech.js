@@ -150,7 +150,7 @@ export function useTextToSpeech({ region = 'us-east-2', getCredentials, voiceId 
                 const client = pollyClientRef.current;
 
                 const command = new SynthesizeSpeechCommand({
-                    Engine: 'neural',
+                    Engine: 'generative',
                     OutputFormat: 'mp3',
                     Text: text,
                     VoiceId: voiceId,

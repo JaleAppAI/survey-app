@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/data';
-import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth';
+import { signIn, signOut, fetchAuthSession, confirmSignIn } from 'aws-amplify/auth';
 import { uploadData, remove } from 'aws-amplify/storage';
 import { PollyClient, SynthesizeSpeechCommand } from '@aws-sdk/client-polly';
 import './AdminPage.css';
@@ -449,13 +449,31 @@ function LoginForm({ onSuccess }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsNewPassword, setNeedsNewPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const validatePassword = (pw) => {
+    const issues = [];
+    if (pw.length < 8) issues.push('At least 8 characters');
+    if (!/[A-Z]/.test(pw)) issues.push('At least one uppercase letter');
+    if (!/[a-z]/.test(pw)) issues.push('At least one lowercase letter');
+    if (!/[0-9]/.test(pw)) issues.push('At least one number');
+    if (!/[^A-Za-z0-9]/.test(pw)) issues.push('At least one symbol');
+    return issues;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      await signIn({ username: email, password });
+      const result = await signIn({ username: email, password });
+      if (result.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+        setNeedsNewPassword(true);
+        setLoading(false);
+        return;
+      }
       onSuccess();
     } catch (err) {
       setError('Sign in failed. Please check your credentials.');
@@ -463,6 +481,74 @@ function LoginForm({ onSuccess }) {
       setLoading(false);
     }
   };
+
+  const handleNewPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    const issues = validatePassword(newPassword);
+    if (issues.length > 0) {
+      setError('Password requirements not met: ' + issues.join(', ') + '.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await confirmSignIn({ challengeResponse: newPassword });
+      onSuccess();
+    } catch (err) {
+      setError(err.message || 'Failed to set new password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (needsNewPassword) {
+    return (
+      <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div style={{ ...styles.card, width: '100%', maxWidth: 400 }}>
+          <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>
+            Set New Password
+          </h2>
+          <p style={{ margin: '0 0 24px', fontSize: '13px', color: '#64748b' }}>
+            Your account requires a new password on first sign-in.
+          </p>
+          <form onSubmit={handleNewPassword}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={styles.label}>New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                style={styles.input}
+                required
+                autoFocus
+              />
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={styles.label}>Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                style={styles.input}
+                required
+              />
+            </div>
+            <p style={{ margin: '0 0 20px', fontSize: '12px', color: '#94a3b8', lineHeight: 1.5 }}>
+              Must be 8+ characters with uppercase, lowercase, number, and symbol.
+            </p>
+            {error && <p style={styles.errorText}>{error}</p>}
+            <button type="submit" style={{ ...styles.primaryBtn, width: '100%', marginTop: '8px' }} disabled={loading}>
+              {loading ? 'Setting password...' : 'Set Password'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>

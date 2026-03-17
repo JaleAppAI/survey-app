@@ -28,15 +28,17 @@ function pcmEncode(float32Array) {
  * @param {string} options.region - AWS region (e.g. "us-east-2")
  * @param {string} [options.languageOptions="en-US,es-US"] - Comma-separated language codes for auto-detection
  * @param {() => Promise<{accessKeyId, secretAccessKey, sessionToken}>} options.getCredentials
- * @param {number} [options.maxDurationMs=120000] - Max recording duration in ms (default 2 min)
+ * @param {number} [options.maxDurationMs=30000] - Max recording duration in ms (default 30s)
+ * @param {() => void} [options.onTimerExpired] - Callback fired when the max-duration timer expires (after recording auto-stops)
  */
-export function useRealtimeTranscription({ region, languageOptions, getCredentials, maxDurationMs = 120000, onVoiceCommand }) {
+export function useRealtimeTranscription({ region, languageOptions, getCredentials, maxDurationMs = 30000, onVoiceCommand, onTimerExpired }) {
     const [partialTranscript, setPartialTranscript] = useState('');
     const partialTranscriptRef = useRef('');
     const [finalTranscript, setFinalTranscript] = useState('');
     const finalTranscriptRef = useRef('');
     const [isRecording, setIsRecording] = useState(false);
     const [error, setError] = useState(null);
+    const [secondsRemaining, setSecondsRemaining] = useState(Math.ceil(maxDurationMs / 1000));
 
     const updatePartial = useCallback((val) => {
         setPartialTranscript(val);
@@ -65,6 +67,8 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
     const audioBufferQueueRef = useRef([]);
     const resolveAudioChunkRef = useRef(null);
     const timeoutRef = useRef(null);
+    const countdownRef = useRef(null);
+    const onTimerExpiredRef = useRef(onTimerExpired);
     const stopRecordingRef = useRef(null);
 
     /**
@@ -134,9 +138,19 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
             processor.connect(audioContext.destination);
             setIsRecording(true);
 
+            // Start countdown timer
+            setSecondsRemaining(Math.ceil(maxDurationMs / 1000));
+            countdownRef.current = setInterval(() => {
+                setSecondsRemaining((prev) => {
+                    if (prev <= 1) return 0;
+                    return prev - 1;
+                });
+            }, 1000);
+
             // Auto-stop after max duration
             timeoutRef.current = setTimeout(() => {
                 stopRecordingRef.current?.();
+                onTimerExpiredRef.current?.();
             }, maxDurationMs);
 
             // 4. Create async generator for the Transcribe SDK
@@ -175,7 +189,7 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
             const response = await client.send(command);
 
             // 6. Process results
-            for await (const event of response.TranscriptResultStream) {
+            streamLoop: for await (const event of response.TranscriptResultStream) {
                 if (isStoppedRef.current) break;
                 const results = event?.TranscriptEvent?.Transcript?.Results;
                 if (!results || results.length === 0) continue;
@@ -185,18 +199,27 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
                     if (result.IsPartial) {
                         updatePartial(transcript);
                     } else {
-                        const lowerTranscript = transcript.toLowerCase();
-                        if (lowerTranscript.includes('next question')) {
-                            const withoutCommand = transcript.substring(0, lowerTranscript.indexOf('next question') || lowerTranscript.indexOf('next'));
-                            let updatedFinal = finalTranscriptRef.current;
-                            if (withoutCommand.trim()) {
-                                updatedFinal = (updatedFinal ? updatedFinal + ' ' : '') + withoutCommand.trim();
-                                updateFinal(updatedFinal);
-                            } else {
-                            }
+                        // Build the prospective accumulated transcript to catch
+                        // "next question" even when Transcribe splits it across
+                        // two separate final results (e.g. "next" then "question")
+                        const prospectiveFinal = finalTranscriptRef.current
+                            ? finalTranscriptRef.current + ' ' + transcript
+                            : transcript;
+                        // Strip punctuation and collapse whitespace for command matching
+                        const normalizeForCommand = (text) =>
+                            text.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+
+                        const normalizedProspective = normalizeForCommand(prospectiveFinal);
+
+                        if (normalizedProspective.includes('next question')) {
+                            // Remove "next <punctuation/space> question" from original text
+                            const commandRegex = /next[\s.,!?;:]*question/i;
+                            const withoutCommand = prospectiveFinal.replace(commandRegex, '').trim();
+                            updateFinal(withoutCommand);
                             updatePartial('');
-                            onVoiceCommand?.('NEXT_QUESTION', updatedFinal);
-                            break;
+                            isStoppedRef.current = true;
+                            onVoiceCommand?.('NEXT_QUESTION', withoutCommand);
+                            break streamLoop;
                         }
 
                         appendFinal(transcript);
@@ -211,10 +234,29 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
                 setError(`Transcription error: ${err.message}`);
             }
         } finally {
+            // Clean up all resources (idempotent — safe if stopRecording already ran)
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+            if (countdownRef.current) {
+                clearInterval(countdownRef.current);
+                countdownRef.current = null;
+            }
+            processorRef.current?.disconnect();
+            processorRef.current = null;
+            sourceRef.current?.disconnect();
+            sourceRef.current = null;
+            audioContextRef.current?.close();
+            audioContextRef.current = null;
+            mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+            mediaStreamRef.current = null;
+            clientRef.current?.destroy();
+            clientRef.current = null;
             setIsRecording(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [region, languageOptions, getCredentials, pushAudioChunk, maxDurationMs, onVoiceCommand]);
+    }, [region, languageOptions, getCredentials, pushAudioChunk, maxDurationMs, onVoiceCommand, onTimerExpired]);
 
     const stopRecording = useCallback(() => {
         isStoppedRef.current = true;
@@ -223,6 +265,12 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
             timeoutRef.current = null;
+        }
+
+        // Clear countdown interval
+        if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
         }
 
         // Wake the async generator so it can exit
@@ -257,20 +305,23 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
         updatePartial('');
     }, [updatePartial]);
 
-    // Keep ref in sync so the timeout can always call the latest stopRecording
+    // Keep refs in sync so the timeout can always call the latest functions
     stopRecordingRef.current = stopRecording;
+    onTimerExpiredRef.current = onTimerExpired;
 
     const resetTranscript = useCallback(() => {
         updatePartial('');
         updateFinal('');
         setError(null);
-    }, [updatePartial, updateFinal]);
+        setSecondsRemaining(Math.ceil(maxDurationMs / 1000));
+    }, [updatePartial, updateFinal, maxDurationMs]);
 
     // Cleanup on unmount
     useEffect(() => {
         return () => {
             isStoppedRef.current = true;
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (countdownRef.current) clearInterval(countdownRef.current);
             processorRef.current?.disconnect();
             sourceRef.current?.disconnect();
             audioContextRef.current?.close();
@@ -284,6 +335,7 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
         finalTranscript,
         isRecording,
         error,
+        secondsRemaining,
         startRecording,
         stopRecording,
         resetTranscript,

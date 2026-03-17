@@ -44,6 +44,34 @@
     }
 }
 
+/* Countdown timer */
+.voice-recorder-countdown {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f44336;
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    min-width: 32px;
+    text-align: right;
+}
+
+.voice-recorder-countdown--warn {
+    color: #ff6f00;
+    animation: voice-recorder-countdown-blink 0.6s ease-in-out infinite;
+}
+
+@keyframes voice-recorder-countdown-blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
 /* Transcript box */
 .voice-recorder-transcript-box {
     min-height: 60px;

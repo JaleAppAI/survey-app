@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import './Question.css';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { Volume2, VolumeX } from 'lucide-react';
 import VoiceRecorder from './VoiceRecorder';
 
 function Question({
@@ -13,8 +14,11 @@ function Question({
     hasError = false,
     autoStartRecording,
     onRecordingStarted,
+    audioKey,
     speak,
-    stopSpeaking
+    stopSpeaking,
+    isSpeaking = false,
+    isLastQuestion = false,
 }) {
     const [liveFinal, setLiveFinal] = useState("");
     const [livePartial, setLivePartial] = useState("");
@@ -24,12 +28,16 @@ function Question({
         return credentials;
     }, []);
 
-    const speakQuestion = () => {
-        speak(questionText);
-    };
-
     const handleTranscriptConfirmed = (text) => {
         onChange(value ? `${value} ${text}` : text);
+    };
+
+    const handlePlayQuestion = () => {
+        if (isSpeaking) {
+            stopSpeaking();
+        } else {
+            speak(questionText, audioKey);
+        }
     };
 
     const hasLiveAudio = liveFinal || livePartial;
@@ -39,10 +47,20 @@ function Question({
 
     return (
         <div className={`question-container form-card-shadow${hasError ? ' question-container--error' : ''}`}>
-            <h2>
-                {questionNumber}. {questionText}
-                <span className="text-required"> *</span>
-            </h2>
+            <div className="question-header">
+                <h2>
+                    {questionNumber}. {questionText}
+                    <span className="text-required"> *</span>
+                </h2>
+                <button
+                    type="button"
+                    className={`question-play-btn${isSpeaking ? ' question-play-btn--active' : ''}`}
+                    onClick={handlePlayQuestion}
+                    title={isSpeaking ? 'Stop reading' : 'Listen to question'}
+                >
+                    {isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                </button>
+            </div>
             <div className="question-content-wrapper">
                 <div className="question-textarea-wrapper">
                     <textarea
@@ -52,8 +70,7 @@ function Question({
                         value={displayValue}
                         readOnly={!!hasLiveAudio}
                         onChange={(e) => onChange(e.target.value)}
-                        onFocus={speakQuestion}
-                        onBlur={() => stopSpeaking()}
+                        maxLength={5000}
                     />
                     {hasError && <p className="question-error-msg">This field is required.</p>}
                 </div>
@@ -71,7 +88,8 @@ function Question({
                 onTranscriptCleared={() => onChange('')}
                 autoStartRecording={autoStartRecording}
                 onRecordingStarted={onRecordingStarted}
-                onRecordStart={speakQuestion}
+                maxRecordingMs={30000}
+                isLastQuestion={isLastQuestion}
             />
         </div>
     );

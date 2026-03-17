@@ -9,7 +9,8 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.guest().to(['read']),
-      allow.authenticated().to(['read', 'create', 'update']),
+      allow.authenticated('identityPool').to(['read', 'create', 'update', 'delete']),
+      allow.authenticated('userPools').to(['read', 'create', 'update', 'delete']),
     ]),
 
   Question: a
@@ -17,12 +18,14 @@ const schema = a.schema({
       text: a.string().required(),
       order: a.integer().required(),
       conditions: a.json(),
+      audioKey: a.string(),
       surveyId: a.id().required(),
       survey: a.belongsTo('Survey', 'surveyId'),
     })
     .authorization((allow) => [
       allow.guest().to(['read']),
-      allow.authenticated().to(['read', 'create', 'update']),
+      allow.authenticated('identityPool').to(['read', 'create', 'update', 'delete']),
+      allow.authenticated('userPools').to(['read', 'create', 'update', 'delete']),
     ]),
 
   Submission: a
@@ -36,7 +39,8 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.guest().to(['create']),
-      allow.authenticated().to(['create', 'read']),
+      allow.authenticated('identityPool').to(['create', 'read', 'delete']),
+      allow.authenticated('userPools').to(['create', 'read', 'delete']),
     ]),
 });
 

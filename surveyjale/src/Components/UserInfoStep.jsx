@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './UserInfoStep.css';
 
 function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(email);
 }
 
 function UserInfoStep({ onComplete }) {
@@ -37,6 +37,7 @@ function UserInfoStep({ onComplete }) {
               placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={100}
               required
             />
           </div>
@@ -52,6 +53,7 @@ function UserInfoStep({ onComplete }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => setEmailTouched(true)}
+              maxLength={254}
               required
             />
             {emailInvalid && (
@@ -69,6 +71,7 @@ function UserInfoStep({ onComplete }) {
               placeholder="e.g. Healthcare, Finance, Technology"
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
+              maxLength={100}
               required
             />
           </div>

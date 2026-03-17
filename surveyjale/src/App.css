@@ -10,10 +10,24 @@
 
 .submit-btn-wrapper {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     max-width: 620px;
     margin: 24px auto 40px auto;
     align-items: center;
+}
+
+.submit-error {
+    width: 100%;
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'Syne', sans-serif;
+    margin: 0 0 12px;
+    text-align: center;
 }
 
 .submit-btn {

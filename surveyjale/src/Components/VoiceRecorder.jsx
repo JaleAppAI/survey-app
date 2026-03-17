@@ -13,7 +13,8 @@ export default function VoiceRecorder({
     onTranscriptCleared,
     autoStartRecording,
     onRecordingStarted,
-    onRecordStart,
+    maxRecordingMs = 30000,
+    isLastQuestion = false,
 }) {
     const handleVoiceCommand = (command, finalTranscriptParam) => {
         if (command === 'NEXT_QUESTION') {
@@ -23,7 +24,7 @@ export default function VoiceRecorder({
             onTranscriptConfirmed?.(transcriptToSave);
             onVoiceCommand?.(command);
 
-            // Allow React cycle to flush the confirmed transcript up to the Question component 
+            // Allow React cycle to flush the confirmed transcript up to the Question component
             // before we blank it out locally
             setTimeout(() => {
                 resetTranscript();
@@ -31,11 +32,27 @@ export default function VoiceRecorder({
         }
     };
 
+    const handleTimerExpired = () => {
+        setConfirmed(true);
+        const transcriptToSave = finalTranscript;
+        onTranscriptConfirmed?.(transcriptToSave);
+
+        // Only auto-advance if not the last question
+        if (!isLastQuestion) {
+            onVoiceCommand?.('NEXT_QUESTION');
+        }
+
+        setTimeout(() => {
+            resetTranscript();
+        }, 50);
+    };
+
     const {
         partialTranscript,
         finalTranscript,
         isRecording,
         error,
+        secondsRemaining,
         startRecording,
         stopRecording,
         resetTranscript,
@@ -43,7 +60,9 @@ export default function VoiceRecorder({
         region,
         languageOptions,
         getCredentials,
-        onVoiceCommand: handleVoiceCommand
+        maxDurationMs: maxRecordingMs,
+        onVoiceCommand: handleVoiceCommand,
+        onTimerExpired: handleTimerExpired,
     });
 
     const [confirmed, setConfirmed] = useState(false);
@@ -79,6 +98,9 @@ export default function VoiceRecorder({
                 <div className="voice-recorder-indicator">
                     <span className="voice-recorder-dot" />
                     Recording — speak now
+                    <span className={`voice-recorder-countdown${secondsRemaining <= 5 ? ' voice-recorder-countdown--warn' : ''}`}>
+                        {secondsRemaining}s
+                    </span>
                 </div>
             )}
 
@@ -119,10 +141,7 @@ export default function VoiceRecorder({
                 ) : (
                     <button
                         className="voice-recorder-btn voice-recorder-btn--record"
-                        onClick={() => {
-                            onRecordStart?.();
-                            startRecording();
-                        }}
+                        onClick={startRecording}
                     >
                         <Mic size={16} />
                         Record

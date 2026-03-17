@@ -6,7 +6,7 @@ import SuccessStep from './Components/SuccessStep';
 import { Send } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import ErrorBoundary from './Components/ErrorBoundary';
-import { Routes, Route, useSearchParams } from 'react-router-dom';
+import { Routes, Route, useSearchParams, Navigate } from 'react-router-dom';
 // TODO: Uncomment for amplify to work
 import { generateClient } from 'aws-amplify/data';
 import { fetchAuthSession } from 'aws-amplify/auth';
@@ -197,19 +197,7 @@ function SurveyApp() {
   };
 
   if (!surveyId) {
-    return (
-      <div className="App">
-        <div style={{
-          maxWidth: 620,
-          margin: '80px auto',
-          textAlign: 'center',
-          fontFamily: 'Syne, sans-serif'
-        }}>
-          <h1>Invalid survey link</h1>
-          <p>Please use the link provided to you to access this survey.</p>
-        </div>
-      </div>
-    );
+    return <Navigate to="/admin" replace />;
   }
 
   if (step === 'info') {

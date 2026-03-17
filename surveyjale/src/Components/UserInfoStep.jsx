@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './UserInfoStep.css';
 
 function isValidEmail(email) {
@@ -6,6 +7,7 @@ function isValidEmail(email) {
 }
 
 function UserInfoStep({ onComplete }) {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [industry, setIndustry] = useState('');
@@ -23,6 +25,15 @@ function UserInfoStep({ onComplete }) {
   return (
     <div className="user-info-step">
       <div className="user-info-card">
+        <div className="user-info-admin-link-row">
+          <button
+            type="button"
+            className="user-info-admin-link"
+            onClick={() => navigate('/admin')}
+          >
+            Admin
+          </button>
+        </div>
         <h2 className="user-info-title">Before we begin</h2>
         <p className="user-info-subtitle">Please enter your details to continue.</p>
         <form onSubmit={handleSubmit} noValidate>

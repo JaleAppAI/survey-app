@@ -35,7 +35,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    background: linear-gradient(135deg, #0179FF, #0164D9);
     color: #ffffff;
     height: auto;
     align-self: center;
@@ -48,12 +48,12 @@
     font-size: 0.95rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     padding: 12px 28px;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 12px rgba(1, 121, 255, 0.3);
 }
 
 .submit-btn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 6px 20px rgba(1, 121, 255, 0.4);
 }
 
 .clear-btn {

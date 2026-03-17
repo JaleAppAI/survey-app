@@ -20,7 +20,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb, #60a5fa);
+  background: linear-gradient(135deg, #0179FF, #4DB3FF);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +38,7 @@
   font-family: 'Syne', sans-serif;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #181855;
   margin: 0 0 16px 0;
   letter-spacing: -0.03em;
 }
@@ -48,7 +48,7 @@
   display: block;
   width: 40px;
   height: 3px;
-  background: linear-gradient(90deg, #2563eb, #60a5fa);
+  background: linear-gradient(90deg, #0179FF, #4DB3FF);
   border-radius: 2px;
   margin: 10px auto 0 auto;
 }

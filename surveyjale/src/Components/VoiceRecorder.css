@@ -82,11 +82,11 @@
     font-family: 'Syne', sans-serif;
     font-size: 0.9rem;
     line-height: 1.5;
-    color: #1a1a2e;
+    color: #181855;
 }
 
 .voice-recorder-final {
-    color: #1a1a2e;
+    color: #181855;
 }
 
 .voice-recorder-partial {
@@ -122,11 +122,11 @@
 }
 
 .voice-recorder-btn--record {
-    background: #2563eb;
+    background: #0179FF;
 }
 
 .voice-recorder-btn--record:hover {
-    background: #1d4ed8;
+    background: #0164D9;
 }
 
 .voice-recorder-btn--stop {
@@ -138,11 +138,11 @@
 }
 
 .voice-recorder-btn--confirm {
-    background: #4CAF50;
+    background: #21C3A4;
 }
 
 .voice-recorder-btn--confirm:hover {
-    background: #388E3C;
+    background: #1AA88C;
 }
 
 .voice-recorder-btn--rerecord {

@@ -16,7 +16,7 @@ import { getUrl } from 'aws-amplify/storage';
  * @param {string} [options.voiceId='Ruth'] - Polly voice ID
  * @returns {{ speak: (text: string, audioKey?: string) => void, stop: () => void, isSpeaking: boolean }}
  */
-export function useTextToSpeech({ region = 'us-east-2', getCredentials, voiceId = 'Ruth' } = {}) {
+export function useTextToSpeech({ region = 'us-east-1', getCredentials, voiceId = 'Ruth' } = {}) {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const audioRef = useRef(null);
     const objectUrlRef = useRef(null);

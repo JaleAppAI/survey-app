@@ -24,7 +24,7 @@ export default class ErrorBoundary extends Component {
                     fontFamily: 'Syne, sans-serif',
                     padding: '0 16px',
                 }}>
-                    <h1 style={{ fontSize: '22px', color: '#1a1a2e', marginBottom: '12px' }}>
+                    <h1 style={{ fontSize: '22px', color: '#181855', marginBottom: '12px' }}>
                         Something went wrong
                     </h1>
                     <p style={{ color: '#64748b', fontSize: '15px', marginBottom: '24px' }}>
@@ -33,7 +33,7 @@ export default class ErrorBoundary extends Component {
                     <button
                         onClick={() => window.location.reload()}
                         style={{
-                            background: '#2563eb',
+                            background: '#0179FF',
                             color: '#fff',
                             border: 'none',
                             borderRadius: '8px',

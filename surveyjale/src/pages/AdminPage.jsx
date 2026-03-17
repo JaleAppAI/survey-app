@@ -42,7 +42,7 @@ const styles = {
     margin: 0,
     fontSize: '20px',
     fontWeight: 700,
-    color: '#1a1a2e',
+    color: '#181855',
   },
   card: {
     background: '#fff',
@@ -80,7 +80,7 @@ const styles = {
     boxSizing: 'border-box',
   },
   primaryBtn: {
-    background: '#2563eb',
+    background: '#0179FF',
     color: '#fff',
     border: 'none',
     borderRadius: '6px',
@@ -91,7 +91,7 @@ const styles = {
     fontWeight: 600,
   },
   exportBtn: {
-    background: '#2563eb',
+    background: '#0179FF',
     color: '#fff',
     border: 'none',
     borderRadius: '6px',
@@ -171,7 +171,7 @@ const styles = {
     margin: '0 0 14px',
     fontSize: '17px',
     fontWeight: 700,
-    color: '#1a1a2e',
+    color: '#181855',
   },
   modalInfoGrid: {
     display: 'grid',
@@ -238,7 +238,7 @@ const styles = {
     minWidth: '22px',
     height: '22px',
     borderRadius: '50%',
-    background: '#2563eb',
+    background: '#0179FF',
     color: '#fff',
     fontSize: '11px',
     fontWeight: 700,
@@ -248,7 +248,7 @@ const styles = {
   qaQuestionText: {
     fontSize: '13px',
     fontWeight: 600,
-    color: '#1a1a2e',
+    color: '#181855',
     lineHeight: 1.5,
   },
   qaAnswer: {
@@ -271,7 +271,7 @@ const styles = {
     margin: 0,
     fontSize: '16px',
     fontWeight: 700,
-    color: '#1e293b',
+    color: '#181855',
   },
   emptyState: {
     textAlign: 'center',
@@ -326,12 +326,12 @@ const styles = {
     whiteSpace: 'nowrap',
   },
   copyBtnSuccess: {
-    background: '#f0fdf4',
-    color: '#16a34a',
-    border: '1px solid #bbf7d0',
+    background: '#E8FAF6',
+    color: '#1AA88C',
+    border: '1px solid #A3E8DA',
   },
   createBtn: {
-    background: '#2563eb',
+    background: '#0179FF',
     color: '#fff',
     border: 'none',
     borderRadius: '6px',
@@ -363,11 +363,11 @@ const styles = {
   csvSuccess: {
     margin: '8px 0 0',
     padding: '8px 12px',
-    background: '#f0fdf4',
-    border: '1px solid #bbf7d0',
+    background: '#E8FAF6',
+    border: '1px solid #A3E8DA',
     borderRadius: '6px',
     fontSize: '13px',
-    color: '#16a34a',
+    color: '#1AA88C',
     fontWeight: 600,
   },
   successState: {
@@ -381,8 +381,8 @@ const styles = {
     width: '56px',
     height: '56px',
     borderRadius: '50%',
-    background: '#f0fdf4',
-    border: '2px solid #bbf7d0',
+    background: '#E8FAF6',
+    border: '2px solid #A3E8DA',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -467,7 +467,7 @@ function LoginForm({ onSuccess }) {
   return (
     <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
       <div style={{ ...styles.card, width: '100%', maxWidth: 400 }}>
-        <h2 style={{ margin: '0 0 24px', fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>
+        <h2 style={{ margin: '0 0 24px', fontSize: '20px', fontWeight: 700, color: '#181855' }}>
           Admin Sign In
         </h2>
         <form onSubmit={handleLogin}>
@@ -624,7 +624,7 @@ function CreateSurveyModal({ onClose, onCreate }) {
       try {
         const { credentials } = await fetchAuthSession();
         const polly = new PollyClient({
-          region: 'us-east-2',
+          region: 'us-east-1',
           credentials: {
             accessKeyId: credentials.accessKeyId,
             secretAccessKey: credentials.secretAccessKey,
@@ -688,7 +688,7 @@ function CreateSurveyModal({ onClose, onCreate }) {
       <div style={styles.modalBackdrop} onClick={creating ? undefined : onClose} />
       <div style={styles.modalCard}>
         <div style={styles.modalHeader}>
-          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#1a1a2e' }}>
+          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#181855' }}>
             {createdLink ? 'Survey Created' : 'Create Survey'}
           </h2>
           {!creating && (
@@ -709,7 +709,7 @@ function CreateSurveyModal({ onClose, onCreate }) {
         ) : createdLink ? (
           <div style={styles.successState}>
             <div style={styles.successIcon}>✓</div>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: '#1a1a2e' }}>{createdName}</p>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: '#181855' }}>{createdName}</p>
             <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
               Survey created with {csvQuestions.length} question{csvQuestions.length !== 1 ? 's' : ''}.
             </p>
@@ -882,7 +882,7 @@ function DeleteSurveyModal({ surveyName, onConfirm, onClose, deleting }) {
       <div style={styles.modalBackdrop} onClick={deleting ? undefined : onClose} />
       <div style={styles.modalCard}>
         <div style={styles.modalHeader}>
-          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#1a1a2e' }}>
+          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#181855' }}>
             Delete Survey
           </h2>
           {!deleting && (

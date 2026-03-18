@@ -1,12 +1,12 @@
 /* ── VoiceRecorder ────────────────────────────────────── */
 
 .voice-recorder {
-    margin-top: 12px;
+    margin-top: 14px;
 }
 
 /* Error message */
 .voice-recorder-error {
-    color: #f44336;
+    color: #ef4444;
     font-size: 0.85rem;
     margin-bottom: 8px;
 }
@@ -17,21 +17,20 @@
     align-items: center;
     gap: 8px;
     font-size: 0.85rem;
-    color: #f44336;
+    color: #ef4444;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .voice-recorder-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #f44336;
+    background: #ef4444;
     animation: voice-recorder-pulse 1s ease-in-out infinite;
 }
 
 @keyframes voice-recorder-pulse {
-
     0%,
     100% {
         opacity: 1;
@@ -48,7 +47,7 @@
 .voice-recorder-countdown {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #f44336;
+    color: #ef4444;
     margin-left: auto;
     font-variant-numeric: tabular-nums;
     min-width: 32px;
@@ -61,7 +60,6 @@
 }
 
 @keyframes voice-recorder-countdown-blink {
-
     0%,
     100% {
         opacity: 1;
@@ -74,11 +72,11 @@
 
 /* Transcript box */
 .voice-recorder-transcript-box {
-    min-height: 60px;
+    min-height: 56px;
     padding: 12px 14px;
     background: #f8fafc;
     border: 1px solid #dde3ed;
-    border-radius: 8px;
+    border-radius: 10px;
     font-family: 'Syne', sans-serif;
     font-size: 0.9rem;
     line-height: 1.5;
@@ -90,7 +88,7 @@
 }
 
 .voice-recorder-partial {
-    color: #888;
+    color: #94a3b8;
     font-style: italic;
 }
 
@@ -110,9 +108,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 9px 18px;
     border: none;
-    border-radius: 8px;
+    border-radius: 999px;
     font-family: 'Syne', sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
@@ -130,11 +128,11 @@
 }
 
 .voice-recorder-btn--stop {
-    background: #f44336;
+    background: #ef4444;
 }
 
 .voice-recorder-btn--stop:hover {
-    background: #d32f2f;
+    background: #dc2626;
 }
 
 .voice-recorder-btn--confirm {
@@ -163,7 +161,7 @@
     }
 
     .voice-recorder-btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
+        padding: 8px 14px;
+        font-size: 0.82rem;
     }
 }

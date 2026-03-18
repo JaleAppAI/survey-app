@@ -13,7 +13,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     max-width: 620px;
-    margin: 24px auto 40px auto;
+    margin: 32px auto 48px auto;
     align-items: center;
 }
 
@@ -22,8 +22,8 @@
     color: #dc2626;
     background: #fef2f2;
     border: 1px solid #fecaca;
-    border-radius: 6px;
-    padding: 10px 14px;
+    border-radius: 10px;
+    padding: 12px 16px;
     font-size: 14px;
     font-family: 'Syne', sans-serif;
     margin: 0 0 12px;
@@ -35,35 +35,43 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, #0179FF, #0164D9);
+    background: #0179FF;
     color: #ffffff;
     height: auto;
     align-self: center;
     border: none;
     border-radius: 999px;
     cursor: pointer;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     font-family: 'Syne', sans-serif;
     font-weight: 600;
     font-size: 0.95rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    padding: 12px 28px;
-    box-shadow: 0 4px 12px rgba(1, 121, 255, 0.3);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    padding: 14px 32px;
+    box-shadow: 0 2px 8px rgba(1, 121, 255, 0.2);
 }
 
 .submit-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(1, 121, 255, 0.4);
+    background: #0164D9;
+    box-shadow: 0 4px 16px rgba(1, 121, 255, 0.3);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .clear-btn {
     color: #6b7280;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.15s ease;
 }
 
 .clear-btn:hover {
-    color: black;
+    color: #181855;
     text-decoration: underline;
-    cursor: pointer;
 }
 
 @keyframes fadeUp {
@@ -72,24 +80,29 @@
 }
 
 .App ul li {
-    animation: fadeUp 0.35s ease both;
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.App ul li:nth-child(1)  { animation-delay: 0.05s; }
-.App ul li:nth-child(2)  { animation-delay: 0.10s; }
-.App ul li:nth-child(3)  { animation-delay: 0.15s; }
-.App ul li:nth-child(4)  { animation-delay: 0.20s; }
-.App ul li:nth-child(5)  { animation-delay: 0.25s; }
-.App ul li:nth-child(6)  { animation-delay: 0.30s; }
-.App ul li:nth-child(7)  { animation-delay: 0.35s; }
-.App ul li:nth-child(8)  { animation-delay: 0.40s; }
-.App ul li:nth-child(9)  { animation-delay: 0.45s; }
-.App ul li:nth-child(10) { animation-delay: 0.50s; }
-.App ul li:nth-child(11) { animation-delay: 0.55s; }
-.App ul li:nth-child(12) { animation-delay: 0.60s; }
+.App ul li:nth-child(1)  { animation-delay: 0.04s; }
+.App ul li:nth-child(2)  { animation-delay: 0.08s; }
+.App ul li:nth-child(3)  { animation-delay: 0.12s; }
+.App ul li:nth-child(4)  { animation-delay: 0.16s; }
+.App ul li:nth-child(5)  { animation-delay: 0.20s; }
+.App ul li:nth-child(6)  { animation-delay: 0.24s; }
+.App ul li:nth-child(7)  { animation-delay: 0.28s; }
+.App ul li:nth-child(8)  { animation-delay: 0.32s; }
+.App ul li:nth-child(9)  { animation-delay: 0.36s; }
+.App ul li:nth-child(10) { animation-delay: 0.40s; }
+.App ul li:nth-child(11) { animation-delay: 0.44s; }
+.App ul li:nth-child(12) { animation-delay: 0.48s; }
 
 @media only screen and (max-width: 600px) {
     .submit-btn-wrapper {
         padding: 0 20px;
+        margin: 24px auto 40px auto;
+    }
+
+    .submit-btn {
+        padding: 14px 28px;
     }
 }

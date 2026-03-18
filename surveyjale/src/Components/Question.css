@@ -1,6 +1,6 @@
 .question-container {
     max-width: 620px;
-    margin: 0 auto 24px auto;
+    margin: 0 auto 20px auto;
     padding: 32px 52px;
     background: #ffffff;
     border-radius: 16px;
@@ -13,16 +13,16 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .question-container h2 {
     font-family: 'Syne', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: #181855;
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.45;
     letter-spacing: -0.02em;
     display: flex;
     align-items: flex-start;
@@ -41,26 +41,25 @@
     color: #fff;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
     margin-top: -1px;
-    box-shadow: 0 2px 8px rgba(1, 121, 255, 0.25);
+    box-shadow: 0 2px 6px rgba(1, 121, 255, 0.2);
 }
 
 .question-play-btn:hover {
     background: #0164D9;
-    box-shadow: 0 3px 12px rgba(1, 121, 255, 0.35);
+    box-shadow: 0 3px 10px rgba(1, 121, 255, 0.3);
 }
 
 .question-play-btn--active {
     background: #B3DFFF;
     color: #014EAD;
-    box-shadow: 0 1px 4px rgba(1, 121, 255, 0.1);
+    box-shadow: none;
 }
 
 .question-play-btn--active:hover {
     background: #80CBFF;
     color: #014EAD;
-    box-shadow: 0 2px 6px rgba(1, 121, 255, 0.15);
 }
 
 .question-number {
@@ -82,7 +81,7 @@
 .question-content-wrapper {
     display: flex;
     flex-direction: row;
-    gap: 24px;
+    gap: 20px;
     align-items: flex-start;
 }
 
@@ -95,9 +94,9 @@
 .question-textarea {
     width: 100%;
     min-height: 120px;
-    padding: 16px 18px;
+    padding: 14px 16px;
     background: #f8fafc;
-    border: 1px solid #dde3ed;
+    border: 1.5px solid #dde3ed;
     border-radius: 10px;
     color: #181855;
     font-family: 'Syne', sans-serif;
@@ -106,7 +105,7 @@
     resize: vertical;
     outline: none;
     box-sizing: border-box;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .question-textarea::placeholder {
@@ -115,7 +114,8 @@
 
 .question-textarea:focus {
     border-color: #0179FF;
-    box-shadow: 0 0 0 3px rgba(1, 121, 255, 0.12);
+    box-shadow: 0 0 0 3px rgba(1, 121, 255, 0.1);
+    background: #fff;
 }
 
 .question-record-btn {
@@ -154,7 +154,7 @@
 
 .question-textarea--error {
     border-color: #ef4444;
-    background: #fff8f8;
+    background: #fef8f8;
 }
 
 .question-error-msg {
@@ -164,29 +164,29 @@
     margin: 6px 0 0 0;
 }
 
-/* Small mobiles css */
 @media only screen and (max-width: 600px) {
     .question-container {
-        padding: 20px 20px;
-        margin: 25px 20px;
+        padding: 20px 18px;
+        margin: 0 16px 16px;
+        border-radius: 14px;
     }
 
     .question-container h2 {
-        font-size: 1rem;
+        font-size: 0.98rem;
         font-weight: 600;
     }
 
     .question-textarea {
-        min-height: 80px;
-        font-size: .85rem;
+        min-height: 88px;
+        font-size: .88rem;
     }
 
     .question-content-wrapper {
-        gap: 10px;
+        gap: 12px;
     }
 
     .question-record-btn {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
     }
 }

@@ -6,13 +6,7 @@
 
 @layer utilities {
   .form-card-shadow {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-  }
-
-  .form-card-shadow:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04);
-    transform: translateY(-2px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
   }
 }
 
@@ -28,6 +22,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #D4DCE6;
-  background-image: radial-gradient(circle, #a8b5c5 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(circle, #bcc5d1 0.7px, transparent 0.7px);
+  background-size: 28px 28px;
 }

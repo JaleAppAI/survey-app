@@ -12,8 +12,8 @@ function SuccessStep({ name }) {
           {name ? `That's a wrap, ${name}!` : "That's a wrap!"}
         </h1>
         <p className="success-body">
-          Thank you for being so honest. We're taking your feedback—especially
-          what you said about your hiring bottlenecks—and handing it straight to
+          Thank you for being so honest. We're taking your feedback especially
+          what you said about your hiring bottlenecks and handing it straight to
           our engineering team to build the fix.
         </p>
         <p className="success-body">

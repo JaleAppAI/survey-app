@@ -1,10 +1,9 @@
 .form-header {
     background-color: white;
-    padding: 28px 52px;
+    padding: 36px 52px;
     border-radius: 16px;
-    margin: 40px auto;
+    margin: 48px auto 28px;
     max-width: 620px;
-    pointer-events: none;
 }
 
 .form-header h1 {
@@ -24,16 +23,20 @@
     height: 3px;
     background: linear-gradient(90deg, #0179FF, #4DB3FF);
     border-radius: 2px;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 .form-header p {
     font-family: 'Syne', sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    color: #6b7280;
-    margin: 0;
-    line-height: 1.6;
+    font-size: 1.5rem;
+    font-weight: 650;
+    color: #181855;
+    margin: 0 0 12px 0;
+    line-height: 1.65;
+}
+
+.form-header p:last-of-type {
+    margin-bottom: 0;
 }
 
 .text-required-warning {
@@ -41,24 +44,27 @@
     font-size: 2rem;
     align-items: center;
     gap: 4px;
-    padding-top: 15px;
+    padding-top: 16px;
 }
 
 .text-required {
     font-family: 'Syne', sans-serif;
-    color: red;
+    color: #ef4444;
     padding-left: .2rem;
 }
 
-/* Small mobiles css */
 @media only screen and (max-width: 600px) {
     .form-header {
-        padding: 20px 20px;
-        margin: 25px 20px;
+        padding: 24px 20px;
+        margin: 24px 16px 20px;
+        border-radius: 14px;
     }
 
-    .text-required-warning {
-        padding-top: 15px;
+    .form-header h1 {
+        font-size: 1.4rem;
     }
 
+    .form-header p {
+        font-size: 0.92rem;
+    }
 }

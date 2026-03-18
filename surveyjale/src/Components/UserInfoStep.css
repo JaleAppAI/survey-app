@@ -6,9 +6,9 @@
 
 .user-info-card {
     background-color: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
     border-radius: 16px;
-    padding: 40px 52px;
+    padding: 40px 48px;
     width: 100%;
     max-width: 520px;
 }
@@ -27,6 +27,7 @@
     color: #94a3b8;
     cursor: pointer;
     padding: 0;
+    transition: color 0.15s ease;
 }
 
 .user-info-admin-link:hover {
@@ -52,7 +53,7 @@
 }
 
 .user-info-field {
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
 .user-info-label {
@@ -76,20 +77,22 @@
 
 .user-info-input {
     width: 100%;
-    padding: 10px 14px;
+    padding: 11px 14px;
     font-family: 'Syne', sans-serif;
     font-size: 1rem;
     color: #181855;
-    border: 1px solid #dde3ed;
+    border: 1.5px solid #dde3ed;
     border-radius: 10px;
     outline: none;
     box-sizing: border-box;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: #f8fafc;
 }
 
 .user-info-input:focus {
     border-color: #0179FF;
-    box-shadow: 0 0 0 3px rgba(1, 121, 255, 0.12);
+    box-shadow: 0 0 0 3px rgba(1, 121, 255, 0.1);
+    background: #fff;
 }
 
 .user-info-input--error {
@@ -104,24 +107,24 @@
 }
 
 .user-info-btn {
-    margin-top: 8px;
+    margin-top: 12px;
     width: 100%;
-    padding: 12px;
+    padding: 13px;
     font-family: 'Syne', sans-serif;
     font-size: 1rem;
     font-weight: 600;
     color: white;
-    background: linear-gradient(135deg, #0179FF, #0164D9);
+    background: #0179FF;
     border: none;
     border-radius: 999px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(1, 121, 255, 0.3);
-    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(1, 121, 255, 0.2);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .user-info-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(1, 121, 255, 0.4);
+    background: #0164D9;
+    box-shadow: 0 4px 16px rgba(1, 121, 255, 0.3);
 }
 
 .user-info-btn:disabled {
@@ -137,6 +140,10 @@
 
     .user-info-card {
         padding: 28px 20px;
-        margin: 0 20px;
+        margin: 0 16px;
+    }
+
+    .user-info-title {
+        font-size: 1.4rem;
     }
 }

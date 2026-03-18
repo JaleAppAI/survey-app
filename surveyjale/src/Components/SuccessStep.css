@@ -13,7 +13,7 @@
   max-width: 480px;
   width: 100%;
   text-align: center;
-  animation: fadeUp 0.5s ease both;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .success-icon-ring {
@@ -30,8 +30,15 @@
 }
 
 @keyframes iconPop {
-  from { transform: scale(0.5); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .success-title {
@@ -50,24 +57,32 @@
   height: 3px;
   background: linear-gradient(90deg, #0179FF, #4DB3FF);
   border-radius: 2px;
-  margin: 10px auto 0 auto;
+  margin: 12px auto 0 auto;
 }
 
 .success-body {
   font-family: 'Syne', sans-serif;
-  font-size: 1rem;
-  color: #6b7280;
-  line-height: 1.6;
-  margin: 0 0 24px 0;
+  font-size: 1.5rem;
+  color: #181855;
+  font-weight: 650;
+  line-height: 1.65;
+  margin: 0 0 20px 0;
 }
 
 .success-note {
   font-family: 'Syne', sans-serif;
   font-size: 0.85rem;
-  color: #9ba8b8;
+  color: #181855;
   margin: 0;
 }
 
 @media (max-width: 600px) {
-  .success-card { padding: 36px 24px; }
+  .success-card {
+    padding: 36px 24px;
+    border-radius: 14px;
+  }
+
+  .success-title {
+    font-size: 1.5rem;
+  }
 }

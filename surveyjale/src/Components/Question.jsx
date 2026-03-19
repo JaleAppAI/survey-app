@@ -19,6 +19,8 @@ function Question({
     stopSpeaking,
     isSpeaking = false,
     isLastQuestion = false,
+    isAudioDisabled = false,
+    onRecordingStateChange,
 }) {
     const [liveFinal, setLiveFinal] = useState("");
     const [livePartial, setLivePartial] = useState("");
@@ -30,6 +32,8 @@ function Question({
 
     const handleTranscriptConfirmed = (text) => {
         onChange(value ? `${value} ${text}` : text);
+        setLiveFinal("");
+        setLivePartial("");
     };
 
     const handlePlayQuestion = () => {
@@ -57,6 +61,7 @@ function Question({
                     className={`question-play-btn${isSpeaking ? ' question-play-btn--active' : ''}`}
                     onClick={handlePlayQuestion}
                     title={isSpeaking ? 'Stop reading' : 'Listen to question'}
+                    disabled={isAudioDisabled}
                 >
                     {isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
                 </button>
@@ -90,6 +95,8 @@ function Question({
                 onRecordingStarted={onRecordingStarted}
                 maxRecordingMs={30000}
                 isLastQuestion={isLastQuestion}
+                isDisabled={isAudioDisabled}
+                onRecordingStateChange={onRecordingStateChange}
             />
         </div>
     );

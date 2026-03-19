@@ -151,6 +151,23 @@
     background: #4b5563;
 }
 
+.voice-recorder-btn--clear {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+
+.voice-recorder-btn--clear:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.voice-recorder-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* ── Responsive ──────────────────────────────────────── */
 
 @media only screen and (max-width: 600px) {

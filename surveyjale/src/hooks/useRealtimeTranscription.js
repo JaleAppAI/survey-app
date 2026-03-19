@@ -196,32 +196,29 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
 
                 for (const result of results) {
                     const transcript = result.Alternatives?.[0]?.Transcript || '';
+                    
+                    const prospectiveText = finalTranscriptRef.current
+                        ? finalTranscriptRef.current + ' ' + transcript
+                        : transcript;
+                    
+                    const normalizeForCommand = (text) =>
+                        text.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+                    
+                    const normalizedProspective = normalizeForCommand(prospectiveText);
+
+                    if (normalizedProspective.includes('next question')) {
+                        const commandRegex = /(?:\s+)?next[\s.,!?;:]*question[\s.,!?;:]*/i;
+                        const withoutCommand = prospectiveText.replace(commandRegex, '').trim();
+                        updateFinal(withoutCommand);
+                        updatePartial('');
+                        isStoppedRef.current = true;
+                        onVoiceCommand?.('NEXT_QUESTION', withoutCommand);
+                        break streamLoop;
+                    }
+
                     if (result.IsPartial) {
                         updatePartial(transcript);
                     } else {
-                        // Build the prospective accumulated transcript to catch
-                        // "next question" even when Transcribe splits it across
-                        // two separate final results (e.g. "next" then "question")
-                        const prospectiveFinal = finalTranscriptRef.current
-                            ? finalTranscriptRef.current + ' ' + transcript
-                            : transcript;
-                        // Strip punctuation and collapse whitespace for command matching
-                        const normalizeForCommand = (text) =>
-                            text.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
-
-                        const normalizedProspective = normalizeForCommand(prospectiveFinal);
-
-                        if (normalizedProspective.includes('next question')) {
-                            // Remove "next <punctuation/space> question" from original text
-                            const commandRegex = /next[\s.,!?;:]*question/i;
-                            const withoutCommand = prospectiveFinal.replace(commandRegex, '').trim();
-                            updateFinal(withoutCommand);
-                            updatePartial('');
-                            isStoppedRef.current = true;
-                            onVoiceCommand?.('NEXT_QUESTION', withoutCommand);
-                            break streamLoop;
-                        }
-
                         appendFinal(transcript);
                         updatePartial('');
                     }
@@ -298,11 +295,16 @@ export function useRealtimeTranscription({ region, languageOptions, getCredentia
         setIsRecording(false);
 
         // Promote any remaining partial to final
+        let finalOutput = finalTranscriptRef.current;
         const remainingPartial = partialTranscriptRef.current;
         if (remainingPartial) {
-            setFinalTranscript((prev) => (prev ? prev + ' ' : '') + remainingPartial);
+            finalOutput = (finalOutput ? finalOutput + ' ' : '') + remainingPartial;
+            setFinalTranscript(finalOutput);
+            finalTranscriptRef.current = finalOutput;
         }
         updatePartial('');
+
+        return finalOutput;
     }, [updatePartial]);
 
     // Keep refs in sync so the timeout can always call the latest functions

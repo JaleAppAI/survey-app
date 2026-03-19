@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRealtimeTranscription } from '../hooks/useRealtimeTranscription';
-import { Mic, Square, Check, RotateCcw } from 'lucide-react';
+import { Mic, Square, Check, RotateCcw, Trash2 } from 'lucide-react';
 import './VoiceRecorder.css';
 
 export default function VoiceRecorder({
@@ -15,6 +15,8 @@ export default function VoiceRecorder({
     onRecordingStarted,
     maxRecordingMs = 30000,
     isLastQuestion = false,
+    isDisabled = false,
+    onRecordingStateChange,
 }) {
     const handleVoiceCommand = (command, finalTranscriptParam) => {
         if (command === 'NEXT_QUESTION') {
@@ -90,6 +92,15 @@ export default function VoiceRecorder({
         onLiveTranscriptChange?.(finalTranscript, partialTranscript);
     }, [finalTranscript, partialTranscript, onLiveTranscriptChange]);
 
+    const prevIsRecording = useRef(isRecording);
+
+    useEffect(() => {
+        if (isRecording !== prevIsRecording.current) {
+            onRecordingStateChange?.(isRecording);
+            prevIsRecording.current = isRecording;
+        }
+    }, [isRecording, onRecordingStateChange]);
+
     return (
         <div className="voice-recorder">
             {error && <div className="voice-recorder-error">{error}</div>}
@@ -108,6 +119,7 @@ export default function VoiceRecorder({
                 {confirmed ? (
                     <button
                         className="voice-recorder-btn voice-recorder-btn--rerecord"
+                        disabled={isDisabled}
                         onClick={handleReRecord}
                     >
                         <RotateCcw size={16} />
@@ -116,37 +128,42 @@ export default function VoiceRecorder({
                 ) : isRecording ? (
                     <button
                         className="voice-recorder-btn voice-recorder-btn--stop"
-                        onClick={stopRecording}
+                        disabled={isDisabled}
+                        onClick={() => {
+                            const finalStr = stopRecording();
+                            setConfirmed(true);
+                            onTranscriptConfirmed?.(finalStr);
+                            setTimeout(() => resetTranscript(), 50);
+                        }}
                     >
                         <Square size={16} />
                         Stop
                     </button>
-                ) : finalTranscript ? (
-                    <>
-                        <button
-                            className="voice-recorder-btn voice-recorder-btn--confirm"
-                            onClick={handleConfirm}
-                        >
-                            <Check size={16} />
-                            Confirm
-                        </button>
-                        <button
-                            className="voice-recorder-btn voice-recorder-btn--rerecord"
-                            onClick={handleReRecord}
-                        >
-                            <RotateCcw size={16} />
-                            Re-record
-                        </button>
-                    </>
                 ) : (
                     <button
                         className="voice-recorder-btn voice-recorder-btn--record"
+                        disabled={isDisabled}
                         onClick={startRecording}
                     >
                         <Mic size={16} />
                         Record
                     </button>
                 )}
+                
+                <button
+                    className="voice-recorder-btn voice-recorder-btn--clear"
+                    style={{ marginLeft: 'auto' }}
+                    disabled={isDisabled || isRecording}
+                    onClick={() => {
+                        setConfirmed(false);
+                        resetTranscript();
+                        onTranscriptCleared?.();
+                    }}
+                    title="Clear text response"
+                >
+                    <Trash2 size={16} />
+                    Clear
+                </button>
             </div>
         </div>
     );

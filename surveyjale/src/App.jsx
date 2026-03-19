@@ -42,6 +42,7 @@ function SurveyApp() {
   const [fetchError, setFetchError] = useState(false);
   const [recordingIndex, setRecordingIndex] = useState(null);
   const [speakingIndex, setSpeakingIndex] = useState(null);
+  const [activeRecordingIndex, setActiveRecordingIndex] = useState(null);
   const [authMode, setAuthMode] = useState(null);
   const questionRefs = useRef([]);
 
@@ -249,6 +250,8 @@ function SurveyApp() {
               stopSpeaking={stop}
               isSpeaking={isSpeaking && speakingIndex === index}
               isLastQuestion={index === questions.length - 1}
+              isAudioDisabled={(isSpeaking && speakingIndex !== index) || (activeRecordingIndex !== null && activeRecordingIndex !== index)}
+              onRecordingStateChange={(isRecording) => setActiveRecordingIndex(isRecording ? index : null)}
             />
           </li>
         ))}

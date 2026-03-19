@@ -62,6 +62,12 @@
     color: #014EAD;
 }
 
+.question-play-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .question-number {
     display: inline-flex;
     align-items: center;

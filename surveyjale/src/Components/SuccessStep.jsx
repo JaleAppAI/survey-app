@@ -12,20 +12,17 @@ function SuccessStep({ name }) {
           {name ? `That's a wrap, ${name}!` : "That's a wrap!"}
         </h1>
         <p className="success-body">
-          Thank you for being so honest. We're taking your feedback especially
-          what you said about your hiring bottlenecks and handing it straight to
-          our engineering team to build the fix.
+          Thanks for your honest feedback, we're already using it to improve Jale AI.
         </p>
         <p className="success-body">
-          Because you took the time to help us shape the future of Jale AI,
-          we'd like to invite you to be a <strong>Founding Design Partner</strong>.
+          We'd like to invite you to be a Founding Design Partner for Jale AI.
           This means you'll get early access to our automated screening tools
           and a direct line to our team to ensure the platform actually solves
           the hiring headaches you just described.
         </p>
         <p className="success-body">
-          If you're open to a 10-minute follow-up or want to be the first to
-          test our "Ghost-Proof" features, we'll be in touch soon.
+          We'll be in touch soon about testing new tools built to make hiring
+          faster, and more reliable.
         </p>
         <p className="success-note">You may now close this tab.</p>
       </div>

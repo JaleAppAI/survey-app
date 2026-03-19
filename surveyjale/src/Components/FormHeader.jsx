@@ -6,19 +6,16 @@ function FormHeader() {
         <header className="form-header form-card-shadow">
             <h1>Employer Discovery Survey</h1>
             <p>
-                Hi there thanks for taking a few minutes to help us fix hourly hiring.
+                Hi there thanks for taking a few minutes to help improve hourly hiring.
+                We're building JaleAI to make hiring faster, easier, and more effective.
             </p>
             <p>
-                We know that for managers like you, the biggest thief of your time isn't
-                the work itself it's the constant cycle of sorting through bad apps, chasing
-                ghosters, and training people who don't show up. We're rebuilding Jale AI to
-                automate the "busy work" so you can hire the right person in minutes, not days.
+                We'll ask 8 quick questions. Speak naturally, be honest, and tell us what's really happening,
+                your answers will directly shape the platform.
             </p>
             <p>
-                We're going to ask you 8 quick questions. Please don't worry about being
-                formal speak naturally, vent a little if you need to, and tell us the real
-                stories of what's working and what isn't. Your voice is literally going to
-                build the features of this platform.
+                You can type in the box provided or tap the microphone button to speak your answers,
+                then say "Next Question" to move ahead automatically.
             </p>
             <p>
                 You can type your answers or use the microphone button to dictate them.

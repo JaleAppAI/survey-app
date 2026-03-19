@@ -48,6 +48,7 @@
   color: #181855;
   margin: 0 0 16px 0;
   letter-spacing: -0.03em;
+  word-break: break-word;
 }
 
 .success-title::after {

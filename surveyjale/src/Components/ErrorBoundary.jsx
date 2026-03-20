@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import './ErrorBoundary.css';
 
 export default class ErrorBoundary extends Component {
     constructor(props) {
@@ -17,32 +18,12 @@ export default class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div style={{
-                    maxWidth: 520,
-                    margin: '80px auto',
-                    textAlign: 'center',
-                    fontFamily: 'Syne, sans-serif',
-                    padding: '0 16px',
-                }}>
-                    <h1 style={{ fontSize: '22px', color: '#181855', marginBottom: '12px' }}>
-                        Something went wrong
-                    </h1>
-                    <p style={{ color: '#64748b', fontSize: '15px', marginBottom: '24px' }}>
-                        An unexpected error occurred. Please try refreshing the page.
-                    </p>
+                <div className="error-boundary">
+                    <h1>Something went wrong</h1>
+                    <p>An unexpected error occurred. Please try refreshing the page.</p>
                     <button
+                        className="error-boundary-btn"
                         onClick={() => window.location.reload()}
-                        style={{
-                            background: '#0179FF',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '10px 24px',
-                            fontFamily: 'Syne, sans-serif',
-                            fontSize: '15px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                        }}
                     >
                         Refresh Page
                     </button>

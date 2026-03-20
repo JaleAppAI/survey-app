@@ -6,7 +6,7 @@
 
 /* Error message */
 .voice-recorder-error {
-    color: #ef4444;
+    color: var(--color-error);
     font-size: 0.85rem;
     margin-bottom: 8px;
 }
@@ -17,7 +17,7 @@
     align-items: center;
     gap: 8px;
     font-size: 0.85rem;
-    color: #ef4444;
+    color: var(--color-error);
     font-weight: 600;
     margin-bottom: 10px;
 }
@@ -26,7 +26,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #ef4444;
+    background: var(--color-error);
     animation: voice-recorder-pulse 1s ease-in-out infinite;
 }
 
@@ -47,7 +47,7 @@
 .voice-recorder-countdown {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #ef4444;
+    color: var(--color-error);
     margin-left: auto;
     font-variant-numeric: tabular-nums;
     min-width: 32px;
@@ -74,26 +74,26 @@
 .voice-recorder-transcript-box {
     min-height: 56px;
     padding: 12px 14px;
-    background: #f8fafc;
-    border: 1px solid #dde3ed;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
     border-radius: 10px;
     font-family: 'Syne', sans-serif;
     font-size: 0.9rem;
     line-height: 1.5;
-    color: #181855;
+    color: var(--text-primary);
 }
 
 .voice-recorder-final {
-    color: #181855;
+    color: var(--text-primary);
 }
 
 .voice-recorder-partial {
-    color: #94a3b8;
+    color: var(--text-muted);
     font-style: italic;
 }
 
 .voice-recorder-placeholder {
-    color: #9ba8b8;
+    color: var(--text-placeholder);
     font-style: italic;
 }
 
@@ -120,46 +120,46 @@
 }
 
 .voice-recorder-btn--record {
-    background: #0179FF;
+    background: var(--color-primary);
 }
 
 .voice-recorder-btn--record:hover {
-    background: #0164D9;
+    background: var(--color-primary-hover);
 }
 
 .voice-recorder-btn--stop {
-    background: #ef4444;
+    background: var(--color-error);
 }
 
 .voice-recorder-btn--stop:hover {
-    background: #dc2626;
+    background: var(--color-danger);
 }
 
 .voice-recorder-btn--confirm {
-    background: #21C3A4;
+    background: var(--color-accent);
 }
 
 .voice-recorder-btn--confirm:hover {
-    background: #1AA88C;
+    background: var(--color-accent-hover);
 }
 
 .voice-recorder-btn--rerecord {
-    background: #6b7280;
+    background: var(--bg-btn-rerecord);
 }
 
 .voice-recorder-btn--rerecord:hover {
-    background: #4b5563;
+    background: var(--bg-btn-rerecord-hover);
 }
 
 .voice-recorder-btn--clear {
-    background: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #cbd5e1;
+    background: var(--bg-btn-clear);
+    color: var(--text-btn-clear);
+    border: 1px solid var(--border-btn-clear);
 }
 
 .voice-recorder-btn--clear:hover {
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--bg-btn-clear-hover);
+    color: var(--text-secondary);
 }
 
 .voice-recorder-btn:disabled {

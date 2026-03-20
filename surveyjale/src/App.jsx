@@ -6,6 +6,7 @@ import SuccessStep from './Components/SuccessStep';
 import { Send } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import ErrorBoundary from './Components/ErrorBoundary';
+import StickyHeader from './Components/StickyHeader';
 import { Routes, Route, useSearchParams, Navigate } from 'react-router-dom';
 // TODO: Uncomment for amplify to work
 import { generateClient } from 'aws-amplify/data';
@@ -220,10 +221,11 @@ function SurveyApp() {
           maxWidth: 620,
           margin: '80px auto',
           textAlign: 'center',
-          fontFamily: 'Syne, sans-serif'
+          fontFamily: 'Syne, sans-serif',
+          color: 'var(--text-primary)'
         }}>
-          <h1>Failed to load survey questions</h1>
-          <p>Check the browser console for details, or verify your survey link is correct.</p>
+          <h1 style={{ color: 'var(--text-primary)' }}>Failed to load survey questions</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Check the browser console for details, or verify your survey link is correct.</p>
         </div>
       </div>
     );
@@ -278,9 +280,11 @@ function SurveyApp() {
 
 function App() {
   return (
+    <>
+    <StickyHeader />
     <Routes>
       <Route path="/admin" element={
-        <Suspense fallback={<div style={{ textAlign: 'center', padding: '80px 16px', fontFamily: 'Syne, sans-serif', color: '#64748b' }}>Loading...</div>}>
+        <Suspense fallback={<div style={{ textAlign: 'center', padding: '80px 16px', fontFamily: 'Syne, sans-serif', color: 'var(--text-secondary)' }}>Loading...</div>}>
           <ErrorBoundary>
             <AdminPage />
           </ErrorBoundary>
@@ -288,6 +292,7 @@ function App() {
       } />
       <Route path="/*" element={<SurveyApp />} />
     </Routes>
+    </>
   );
 }
 

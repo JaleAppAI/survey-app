@@ -1,15 +1,156 @@
+/* ── Theme tokens ─────────────────────────────── */
+:root {
+  --bg-page: #D4DCE6;
+  --bg-dot: #4572ad;
+  --bg-card: #ffffff;
+  --bg-input: #f8fafc;
+  --bg-input-focus: #ffffff;
+  --text-primary: #181855;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-placeholder: #9ba8b8;
+  --text-label: #374151;
+  --border: #dde3ed;
+  --border-light: #e2e8f0;
+  --border-section: #f1f4f9;
+  --border-modal: #e8edf5;
+  --color-primary: #0179FF;
+  --color-primary-hover: #0164D9;
+  --color-accent: #21C3A4;
+  --color-accent-hover: #1AA88C;
+  --color-error: #ef4444;
+  --color-error-hover: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-error-bg-light: #fef8f8;
+  --color-error-border: #fecaca;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-btn: rgba(1, 121, 255, 0.2);
+  --shadow-btn-hover: rgba(1, 121, 255, 0.3);
+  --shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(1, 121, 255, 0.1);
+  --bg-number-badge: #E6F3FF;
+  --bg-success: #E8FAF6;
+  --border-success: #A3E8DA;
+  --text-success: #1AA88C;
+  --bg-play-active: #B3DFFF;
+  --bg-play-active-hover: #80CBFF;
+  --text-play-active: #014EAD;
+  --bg-btn-disabled: #80CBFF;
+  --bg-btn-rerecord: #6b7280;
+  --bg-btn-rerecord-hover: #4b5563;
+  --bg-btn-clear: #f1f5f9;
+  --text-btn-clear: #64748b;
+  --border-btn-clear: #cbd5e1;
+  --bg-btn-clear-hover: #e2e8f0;
+  --modal-backdrop: rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] {
+  --bg-page: #181855;
+  --bg-dot: #646492;
+  --bg-card: #302e88;
+  --bg-input: #242468;
+  --bg-input-focus: #302e88;
+  --text-primary: #eeeeff;
+  --text-secondary: #8890cc;
+  --text-muted: #8890cc;
+  --text-placeholder: #5a5a99;
+  --text-label: #aab0dd;
+  --border: #4845a0;
+  --border-light: #4845a0;
+  --border-section: #3b3998;
+  --border-modal: #4845a0;
+  --color-error-bg: rgba(239, 68, 68, 0.1);
+  --color-error-bg-light: rgba(239, 68, 68, 0.08);
+  --color-error-border: rgba(239, 68, 68, 0.3);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-btn: rgba(1, 121, 255, 0.3);
+  --shadow-btn-hover: rgba(1, 121, 255, 0.4);
+  --shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  --bg-number-badge: rgba(1, 121, 255, 0.15);
+  --bg-success: rgba(33, 195, 164, 0.1);
+  --border-success: rgba(33, 195, 164, 0.3);
+  --bg-play-active: rgba(1, 121, 255, 0.25);
+  --bg-play-active-hover: rgba(1, 121, 255, 0.35);
+  --text-play-active: #99ccff;
+  --bg-btn-disabled: #335599;
+  --bg-btn-rerecord: #4b5563;
+  --bg-btn-rerecord-hover: #374151;
+  --bg-btn-clear: #3b3998;
+  --text-btn-clear: #8890cc;
+  --border-btn-clear: #5553aa;
+  --bg-btn-clear-hover: #4845a0;
+  --modal-backdrop: rgba(0, 0, 0, 0.6);
+}
+
+/* ── Theme transition (scoped to themed elements) ── */
+body,
+.form-header,
+.question-container,
+.question-textarea,
+.question-play-btn,
+.question-play-btn--active,
+.question-number,
+.question-record-btn,
+.user-info-card,
+.user-info-input,
+.user-info-btn,
+.success-card,
+.voice-recorder-transcript-box,
+.voice-recorder-btn,
+.sticky-header,
+.theme-toggle,
+.error-boundary,
+.error-boundary-btn,
+.submit-btn,
+.submit-error,
+.clear-btn,
+.admin-page,
+.admin-card,
+.admin-select,
+.admin-input,
+.admin-primary-btn,
+.admin-sign-out-btn,
+.admin-create-btn,
+.admin-export-btn,
+.admin-expand-btn,
+.admin-modal-card,
+.admin-modal-close,
+.admin-copy-btn,
+.admin-table th,
+.admin-table td,
+.admin-spinner,
+.admin-qa-answer,
+.admin-csv-errors,
+.admin-csv-success {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
+
+/* ── Layers ───────────────────────────────────── */
 @layer base {
   :root {
-    background-color: #D4DCE6;
+    background-color: var(--bg-page);
   }
 }
 
 @layer utilities {
   .form-card-shadow {
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-card);
   }
 }
 
+/* ── Global resets ────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -18,10 +159,11 @@
 
 body {
   margin: 0;
+  padding-top: 95px;
   font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #D4DCE6;
-  background-image: radial-gradient(circle, #bcc5d1 0.7px, transparent 0.7px);
+  background-color: var(--bg-page);
+  background-image: radial-gradient(circle, var(--bg-dot) 0.7px, transparent 0.7px);
   background-size: 28px 28px;
 }

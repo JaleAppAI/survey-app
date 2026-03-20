@@ -19,9 +19,9 @@
 
 .submit-error {
     width: 100%;
-    color: #dc2626;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    color: var(--color-danger);
+    background: var(--color-error-bg);
+    border: 1px solid var(--color-error-border);
     border-radius: 10px;
     padding: 12px 16px;
     font-size: 14px;
@@ -35,7 +35,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #0179FF;
+    background: var(--color-primary);
     color: #ffffff;
     height: auto;
     align-self: center;
@@ -48,12 +48,12 @@
     font-size: 0.95rem;
     transition: background 0.2s ease, box-shadow 0.2s ease;
     padding: 14px 32px;
-    box-shadow: 0 2px 8px rgba(1, 121, 255, 0.2);
+    box-shadow: 0 2px 8px var(--shadow-btn);
 }
 
 .submit-btn:hover:not(:disabled) {
-    background: #0164D9;
-    box-shadow: 0 4px 16px rgba(1, 121, 255, 0.3);
+    background: var(--color-primary-hover);
+    box-shadow: 0 4px 16px var(--shadow-btn-hover);
 }
 
 .submit-btn:disabled {
@@ -62,16 +62,22 @@
 }
 
 .clear-btn {
-    color: #6b7280;
+    color: var(--text-btn-clear);
     font-family: 'Syne', sans-serif;
     font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: color 0.15s ease;
+    background: var(--bg-btn-clear);
+    border: 1px solid var(--border-btn-clear);
+    border-radius: 999px;
+    padding: 10px 24px;
+    margin: 0;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .clear-btn:hover {
-    color: #181855;
-    text-decoration: underline;
+    background: var(--bg-btn-clear-hover);
+    color: var(--text-primary);
 }
 
 @keyframes fadeUp {

@@ -6,6 +6,12 @@
   <link rel="icon" type="image" href="/JaleLogo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>surveyjale</title>
+  <script>
+    (function() {
+      var t = localStorage.getItem('jale-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
 </head>
 
 <body>

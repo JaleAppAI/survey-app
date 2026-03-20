@@ -2,12 +2,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: calc(100vh - 100px);
   padding: 40px 20px;
 }
 
 .success-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 52px;
   max-width: 480px;
@@ -45,7 +45,7 @@
   font-family: 'Syne', sans-serif;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #181855;
+  color: var(--text-primary);
   margin: 0 0 16px 0;
   letter-spacing: -0.03em;
   word-break: break-word;
@@ -64,7 +64,7 @@
 .success-body {
   font-family: 'Syne', sans-serif;
   font-size: 1.5rem;
-  color: #181855;
+  color: var(--text-primary);
   font-weight: 650;
   line-height: 1.65;
   margin: 0 0 20px 0;
@@ -73,7 +73,7 @@
 .success-note {
   font-family: 'Syne', sans-serif;
   font-size: 0.85rem;
-  color: #181855;
+  color: var(--text-primary);
   margin: 0;
 }
 
